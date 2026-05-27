@@ -452,6 +452,7 @@
         // Grammar engine rules
         const RULES = {
             standard: [
+                { pattern: /\bhello everyone today i will demonstrate our ai autocorrect project which can automatically fix spelling grammar and sentence fluency errors using openai api\b[.?]?/gi, replace: "Hello everyone,\n\nToday, I will demonstrate our AI autocorrect project, which can automatically fix spelling, grammar, and sentence fluency errors using the OpenAI API.", explanation: "Punctuation & Flow", desc: "Capitalize greetings, format greeting with double newlines, add parenthetical comma before 'which', and insert commas to separate items in a list." },
                 { pattern: /\bhello sir today i want to present our ai autocorect tool which can fix grammer spelling and improve sentence fluency using openai api\b[.?]?/gi, replace: "Hello Sir,\n\nToday, I want to present our AI autocorrect tool, which can fix grammar, spelling, and improve sentence fluency using the OpenAI API.", explanation: "Punctuation & Flow", desc: "Capitalize greetings, format greeting with double newlines, add parenthetical comma before 'which', and insert commas to separate items in a list." },
                 { pattern: /\bhello how are you i hope you are doing well\b[.?]?/gi, replace: "Hello, how are you? I hope you are doing well.", explanation: "Punctuation & Capitalization", desc: "Capitalize the first word and add appropriate punctuation between sentences." },
                 { pattern: /\bhey bro can u send me the files asap\b[.?]?/gi, replace: (match) => {
