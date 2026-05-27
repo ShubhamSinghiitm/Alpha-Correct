@@ -64,7 +64,7 @@ Note: Ensure "original" matches exactly a substring in the input text. If no cha
                 'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
             },
             body: JSON.stringify({
-                model: 'gpt-4o-mini',
+                model: 'gpt-3.5-turbo',
                 messages: [
                      { role: 'system', content: systemPrompt },
                      { role: 'user', content: text }
