@@ -1,0 +1,1642 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Alpha Correct | AI-Driven Text Enhancement</title>
+    <!-- Material Symbols -->
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-tertiary": "#ffffff",
+                        "error-container": "#ffdad6",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#edeeef",
+                        "on-primary-fixed": "#002114",
+                        "secondary": "#545f73",
+                        "on-surface-variant": "#3e4943",
+                        "surface-container-highest": "#e1e3e4",
+                        "secondary-container": "#d5e0f8",
+                        "primary-fixed": "#8cf7c7",
+                        "on-tertiary-fixed-variant": "#7c2b2c",
+                        "secondary-fixed-dim": "#bcc7de",
+                        "tertiary-container": "#b75756",
+                        "on-error-container": "#93000a",
+                        "on-surface": "#191c1d",
+                        "on-secondary-fixed-variant": "#3c475a",
+                        "inverse-on-surface": "#f0f1f2",
+                        "surface-container-lowest": "#ffffff",
+                        "outline-variant": "#bdcac1",
+                        "inverse-primary": "#6fdaac",
+                        "primary-fixed-dim": "#6fdaac",
+                        "on-secondary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "secondary-fixed": "#d8e3fb",
+                        "on-secondary-container": "#586377",
+                        "surface-variant": "#e1e3e4",
+                        "surface-tint": "#00A86B",
+                        "inverse-surface": "#2e3132",
+                        "background": "#f8f9fa",
+                        "primary": "#00A86B",
+                        "surface-bright": "#f8f9fa",
+                        "on-background": "#191c1d",
+                        "tertiary-fixed": "#ffdad8",
+                        "on-tertiary-fixed": "#410006",
+                        "primary-container": "#e5f6f0",
+                        "surface-dim": "#d9dadb",
+                        "surface-container-high": "#e7e8e9",
+                        "on-secondary-fixed": "#111c2d",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-tertiary-container": "#fffbff",
+                        "on-primary-fixed-variant": "#005138",
+                        "on-primary-container": "#f5fff7",
+                        "outline": "#6e7a72",
+                        "surface": "#f8f9fa",
+                        "tertiary": "#98403f",
+                        "surface-container-low": "#f3f4f5",
+                        "on-error": "#ffffff"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container_max_width": "1440px",
+                        "workspace_gutter": "1px",
+                        "xl": "32px",
+                        "base": "8px",
+                        "lg": "24px",
+                        "xs": "4px",
+                        "sm": "12px",
+                        "md": "16px"
+                    },
+                    "fontFamily": {
+                        "body-sm": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-md": ["Inter"],
+                        "title-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "display-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "700"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "title-sm": ["18px", {"lineHeight": "24px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .split-divider {
+            width: 6px;
+            margin: 0 -3px;
+            background-color: transparent;
+            position: relative;
+            z-index: 10;
+            cursor: col-resize;
+            transition: background-color 0.2s;
+        }
+        .split-divider::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 2px;
+            width: 2px;
+            background-color: #E5E7EB;
+            transition: background-color 0.2s, width 0.2s, left 0.2s;
+        }
+        html.dark .split-divider::after {
+            background-color: #334155;
+        }
+        .split-divider:hover::after, .split-divider.dragging::after {
+            background-color: #00A86B;
+            width: 4px;
+            left: 1px;
+        }
+        textarea {
+            resize: none;
+            caret-color: #00A86B;
+        }
+        textarea:focus {
+            outline: none;
+        }
+        .ai-highlight {
+            border-bottom: 2px dashed #00A86B;
+            background-color: rgba(0, 168, 107, 0.08);
+            cursor: pointer;
+            padding: 0 2px;
+            border-radius: 2px;
+            transition: all 0.2s;
+        }
+        .ai-highlight:hover {
+            background-color: rgba(0, 168, 107, 0.18);
+        }
+        .custom-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-background dark:bg-slate-950 text-on-surface dark:text-slate-100 min-h-screen flex flex-col font-body-md overflow-hidden transition-colors duration-200">
+
+    <!-- Error Notification Banner -->
+    <div id="error-banner" class="fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-sm px-md flex items-center justify-center gap-sm shadow-md transform -translate-y-full transition-transform duration-300 z-[100]">
+        <span class="material-symbols-outlined">error</span>
+        <span class="text-label-md font-label-md" id="error-message-text">Correction failed. Please check your network connection.</span>
+        <button id="close-error-btn" class="ml-auto hover:opacity-80 flex items-center justify-center">
+            <span class="material-symbols-outlined">close</span>
+        </button>
+    </div>
+
+    <!-- TopNavBar -->
+    <nav class="bg-surface-container-lowest dark:bg-slate-900 border-b border-surface-variant dark:border-slate-800 flex justify-between items-center w-full px-lg h-16 max-w-container_max_width mx-auto sticky top-0 z-50">
+        <div class="flex items-center gap-xl">
+            <span class="text-headline-md font-headline-md text-on-surface dark:text-slate-100 tracking-tight cursor-pointer" onclick="location.reload()">Alpha Correct</span>
+            <div class="hidden md:flex gap-md">
+                <a id="nav-dashboard" class="text-primary border-b-2 border-primary font-bold pb-1 text-label-md font-label-md" href="#">Dashboard</a>
+                <a id="nav-history" class="text-secondary dark:text-slate-400 font-medium hover:text-primary dark:hover:text-primary transition-colors duration-200 text-label-md font-label-md" href="#">History</a>
+                <a id="nav-settings" class="text-secondary dark:text-slate-400 font-medium hover:text-primary dark:hover:text-primary transition-colors duration-200 text-label-md font-label-md" href="#">Settings</a>
+            </div>
+        </div>
+        <div class="flex items-center gap-md">
+            <button class="bg-[#00A86B] text-on-primary px-md py-xs rounded-lg text-label-md font-label-md hover:opacity-90 active:scale-95 transition-all">Upgrade</button>
+            <button id="theme-toggle" class="text-secondary dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center justify-center p-1 rounded-full" title="Toggle Dark Mode">
+                <span class="material-symbols-outlined" data-icon="dark_mode">dark_mode</span>
+            </button>
+            <span class="material-symbols-outlined text-primary cursor-pointer text-[28px]" data-icon="account_circle">account_circle</span>
+        </div>
+    </nav>
+
+    <!-- SideNavBar (Used as Mode Selector) -->
+    <div class="flex flex-1 overflow-hidden">
+        <aside class="hidden md:flex flex-col h-full py-md px-sm gap-base bg-surface dark:bg-slate-900 border-r border-surface-variant dark:border-slate-800 w-60">
+            <div class="px-md mb-base">
+                <h2 class="text-title-sm font-title-sm text-primary">Writing Modes</h2>
+                <p class="text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400">AI Enhancement</p>
+            </div>
+            <nav class="flex flex-col gap-xs">
+                <button class="sidebar-mode-btn flex items-center gap-sm p-sm bg-[#00A86B]/15 text-[#00A86B] dark:bg-[#00A86B]/25 rounded-lg transition-all duration-200 font-semibold" data-mode="standard">
+                    <span class="material-symbols-outlined" data-icon="edit_note">edit_note</span>
+                    <span class="text-label-md font-label-md">Standard</span>
+                </button>
+                <button class="sidebar-mode-btn flex items-center gap-sm p-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-all duration-200" data-mode="fluency">
+                    <span class="material-symbols-outlined" data-icon="auto_fix_high">auto_fix_high</span>
+                    <span class="text-label-md font-label-md">Fluency</span>
+                </button>
+                <button class="sidebar-mode-btn flex items-center gap-sm p-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-all duration-200" data-mode="formal">
+                    <span class="material-symbols-outlined" data-icon="business_center">business_center</span>
+                    <span class="text-label-md font-label-md">Formal</span>
+                </button>
+                <button class="sidebar-mode-btn flex items-center gap-sm p-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-all duration-200" data-mode="academic">
+                    <span class="material-symbols-outlined" data-icon="school">school</span>
+                    <span class="text-label-md font-label-md">Academic</span>
+                </button>
+            </nav>
+            <div class="mt-auto flex flex-col gap-xs border-t border-surface-variant dark:border-slate-800 pt-md">
+                <button class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-850 rounded-lg transition-all">
+                    <span class="material-symbols-outlined" data-icon="help">help</span>
+                    <span class="text-label-md font-label-md">Help</span>
+                </button>
+                <button id="side-settings" class="flex items-center gap-sm p-sm text-on-surface-variant dark:text-slate-400 hover:bg-surface-container-high dark:hover:bg-slate-850 rounded-lg transition-all">
+                    <span class="material-symbols-outlined" data-icon="settings">settings</span>
+                    <span class="text-label-md font-label-md">Settings</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="flex-1 flex flex-col p-lg gap-lg max-w-screen-xl mx-auto w-full overflow-y-auto">
+            <!-- Mode Chips (Mobile Only) -->
+            <div class="flex md:hidden gap-sm overflow-x-auto pb-xs" id="mobile-chips-container">
+                <button class="mobile-chip px-md py-xs border border-[#00A86B] text-[#00A86B] bg-[#00A86B]/10 rounded-full text-label-sm font-label-sm whitespace-nowrap font-medium" data-mode="standard">Standard</button>
+                <button class="mobile-chip px-md py-xs border border-surface-variant dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-full text-label-sm font-label-sm whitespace-nowrap" data-mode="fluency">Fluency</button>
+                <button class="mobile-chip px-md py-xs border border-surface-variant dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-full text-label-sm font-label-sm whitespace-nowrap" data-mode="formal">Formal</button>
+                <button class="mobile-chip px-md py-xs border border-surface-variant dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-full text-label-sm font-label-sm whitespace-nowrap" data-mode="academic">Academic</button>
+            </div>
+            
+            <!-- Editor Container -->
+            <div class="flex-1 flex flex-col md:flex-row bg-surface-container-lowest dark:bg-slate-900 border border-surface-variant dark:border-slate-800 rounded-xl overflow-hidden custom-shadow min-h-[400px]">
+                
+                <!-- Left Panel: Input -->
+                <section id="input-panel" class="flex-1 flex flex-col relative group bg-white dark:bg-slate-900">
+                    <div class="p-md flex justify-between items-center border-b border-surface-variant/50 dark:border-slate-800">
+                        <span class="text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 font-bold">INPUT</span>
+                        <button class="text-on-surface-variant dark:text-slate-400 hover:text-error transition-colors p-1 flex items-center" id="clear-btn" title="Clear text">
+                            <span class="material-symbols-outlined text-[20px]" data-icon="delete_sweep">delete_sweep</span>
+                        </button>
+                    </div>
+                    <textarea class="flex-1 p-lg font-body-md text-body-md bg-transparent dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500" id="input-editor" placeholder="Type or paste your text here to correct errors..."></textarea>
+                    <div class="p-sm bg-surface-container-low/30 dark:bg-slate-900/40 border-t border-surface-variant/30 dark:border-slate-800/50 flex justify-between items-center text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400">
+                        <span class="" id="char-count">0 words | 0 characters</span>
+                        <div class="flex gap-sm items-center">
+                            <span class="material-symbols-outlined text-[16px]" data-icon="spellcheck">spellcheck</span>
+                            <span id="spellcheck-status">Ready</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Desktop Divider -->
+                <div class="hidden md:block split-divider dark:after:bg-slate-800"></div>
+                <!-- Mobile Divider -->
+                <div class="md:hidden h-[1px] bg-surface-variant dark:bg-slate-800"></div>
+
+                <!-- Right Panel: Output -->
+                <section id="output-panel" class="flex-1 flex flex-col bg-slate-50/30 dark:bg-slate-900/20 bg-white dark:bg-slate-900">
+                    <div class="p-md flex justify-between items-center border-b border-surface-variant/50 dark:border-slate-800">
+                        <span class="text-label-sm font-label-sm text-primary dark:text-[#00A86B] font-bold">AI ENHANCED</span>
+                        <button id="copy-btn" class="text-on-surface-variant dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors flex items-center gap-xs" title="Copy text">
+                            <span class="text-label-sm font-label-sm">Copy</span>
+                            <span class="material-symbols-outlined text-[20px]" data-icon="content_copy">content_copy</span>
+                        </button>
+                    </div>
+                    <div class="flex-1 p-lg font-body-md text-body-md overflow-y-auto whitespace-pre-wrap dark:text-slate-100 relative" id="output-view">
+                        <p class="text-on-surface-variant dark:text-slate-500 italic">Enhanced text will appear here after clicking "Fix Text"...</p>
+                    </div>
+                    <div class="p-sm bg-surface-container-low/30 dark:bg-slate-900/40 border-t border-surface-variant/30 dark:border-slate-800/50 flex justify-end items-center text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400">
+                        <div class="flex items-center gap-sm">
+                            <div class="w-2 h-2 rounded-full bg-primary animate-pulse"></div>
+                            <span class="">Optimized</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Central Action Area -->
+            <div class="flex justify-center -mt-8 md:-mt-10 z-20">
+                <button class="bg-[#00A86B] text-on-primary px-xl py-md rounded-full font-title-sm text-title-sm flex items-center gap-md shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:scale-95 transition-all" id="enhance-btn">
+                    <span class="material-symbols-outlined" data-icon="magic_button" style="font-variation-settings: 'FILL' 1;">magic_button</span>
+                    Fix Text
+                </button>
+            </div>
+
+            <!-- Status Footer -->
+            <footer class="mt-auto py-md flex flex-wrap gap-xl items-center justify-center text-on-surface-variant dark:text-slate-400 border-t border-surface-variant/30 dark:border-slate-800/50">
+                <div class="flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary" data-icon="verified_user">verified_user</span>
+                    <span class="text-label-sm font-label-sm">Privacy Guaranteed</span>
+                </div>
+                <div class="flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary" data-icon="bolt">bolt</span>
+                    <span class="text-label-sm font-label-sm">Real-time Correction</span>
+                </div>
+                <div class="flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary" data-icon="psychology">psychology</span>
+                    <span class="text-label-sm font-label-sm">Advanced Context Analysis</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <button id="mobile-history-btn" class="md:hidden fixed bottom-6 right-6 w-14 h-14 bg-[#00A86B] text-on-primary rounded-full shadow-xl flex items-center justify-center active:scale-90 transition-transform z-30">
+        <span class="material-symbols-outlined" data-icon="history">history</span>
+    </button>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <div class="bg-white dark:bg-slate-900 border border-surface-variant dark:border-slate-800 rounded-xl p-lg w-full max-w-md shadow-2xl mx-4 transform scale-95 transition-transform duration-300">
+            <div class="flex justify-between items-center border-b border-surface-variant dark:border-slate-800 pb-md mb-md">
+                <h3 class="text-title-sm font-title-sm text-on-surface dark:text-slate-100 flex items-center gap-sm">
+                    <span class="material-symbols-outlined text-primary">settings</span>
+                    Configuration Settings
+                </h3>
+                <button id="close-settings-btn" class="text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            
+            <form id="settings-form" class="space-y-md">
+                <div>
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 mb-xs font-bold">API PROVIDER</label>
+                    <select id="api-provider" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary dark:text-slate-100 focus:outline-none">
+                        <option value="backend">Backend Server (Secure API)</option>
+                        <option value="demo">Demo Mode (Client-side)</option>
+                        <option value="openai">OpenAI API</option>
+                        <option value="custom">Custom API Endpoint</option>
+                    </select>
+                </div>
+                
+                <div id="api-key-container" class="hidden space-y-xs">
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 mb-xs font-bold">API KEY</label>
+                    <div class="relative">
+                        <input type="password" id="api-key" placeholder="sk-..." class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-sm pr-10 text-body-sm focus:border-primary focus:ring-1 focus:ring-primary dark:text-slate-100 focus:outline-none">
+                        <button type="button" id="toggle-key-visibility" class="absolute right-2 top-1/2 -translate-y-1/2 text-on-surface-variant dark:text-slate-400 hover:text-primary">
+                            <span class="material-symbols-outlined text-[20px]">visibility</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="api-endpoint-container" class="hidden space-y-xs">
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 mb-xs font-bold">ENDPOINT URL</label>
+                    <input type="text" id="api-endpoint" placeholder="https://api.openai.com/v1/chat/completions" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary dark:text-slate-100 focus:outline-none">
+                </div>
+                
+                <div id="api-model-container" class="hidden space-y-xs">
+                    <label class="block text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 mb-xs font-bold">MODEL NAME</label>
+                    <input type="text" id="api-model" placeholder="gpt-4o-mini" class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-sm text-body-sm focus:border-primary focus:ring-1 focus:ring-primary dark:text-slate-100 focus:outline-none">
+                </div>
+
+                <div class="border-t border-slate-200 dark:border-slate-800 pt-md flex justify-end gap-sm">
+                    <button type="button" id="cancel-settings-btn" class="border border-slate-200 dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-lg px-md py-sm text-label-md font-label-md hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors">Cancel</button>
+                    <button type="submit" class="bg-[#00A86B] text-on-primary rounded-lg px-md py-sm text-label-md font-label-md hover:opacity-90 active:scale-95 transition-all">Save Config</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- History Slide-over Panel -->
+    <div id="history-panel" class="fixed inset-y-0 right-0 w-full max-w-sm bg-white dark:bg-slate-900 border-l border-slate-200 dark:border-slate-800 shadow-2xl z-50 transform translate-x-full transition-transform duration-300 flex flex-col">
+        <div class="p-lg border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-900/30">
+            <h3 class="text-title-sm font-title-sm text-on-surface dark:text-slate-100 flex items-center gap-sm font-bold">
+                <span class="material-symbols-outlined text-primary">history</span>
+                Correction History
+            </h3>
+            <button id="close-history-btn" class="text-on-surface-variant dark:text-slate-400 hover:text-primary transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="flex-1 overflow-y-auto p-md space-y-sm" id="history-list">
+            <!-- History items will be rendered dynamically -->
+        </div>
+        <div class="p-md border-t border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/30 flex justify-between items-center">
+            <button id="clear-history-btn" class="text-label-sm font-label-sm text-red-500 hover:underline">Clear History</button>
+            <span class="text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400" id="history-count">0 entries</span>
+        </div>
+    </div>
+    <!-- History Overlay Backdrop -->
+    <div id="history-backdrop" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300"></div>
+
+    <!-- Interactive Tooltip Card -->
+    <div id="correction-tooltip" class="absolute hidden bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-md shadow-2xl z-40 w-80 text-body-sm transition-all duration-150 transform scale-95 opacity-0">
+        <div class="flex justify-between items-start gap-sm mb-xs">
+            <span id="tooltip-category" class="bg-primary/10 text-primary dark:text-[#00A86B] px-2 py-0.5 rounded-full text-label-sm font-label-sm font-bold">Grammar</span>
+            <button id="tooltip-close" class="text-on-surface-variant dark:text-slate-400 hover:text-primary">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+            </button>
+        </div>
+        <div class="mb-sm">
+            <div class="flex items-center gap-xs flex-wrap font-mono mt-xs mb-sm">
+                <span id="tooltip-original" class="text-red-500 line-through">original</span>
+                <span class="material-symbols-outlined text-on-surface-variant dark:text-slate-400 text-[14px]">arrow_forward</span>
+                <span id="tooltip-corrected" class="text-primary dark:text-[#00A86B] font-bold">corrected</span>
+            </div>
+            <p id="tooltip-desc" class="text-on-surface-variant dark:text-slate-300 text-body-sm leading-normal">Description of the change goes here.</p>
+        </div>
+        <div class="flex justify-end gap-sm border-t border-slate-200 dark:border-slate-800 pt-sm">
+            <button id="tooltip-revert-btn" class="bg-slate-50 dark:bg-slate-800 text-on-surface-variant dark:text-slate-300 hover:text-error hover:bg-error-container/20 rounded px-sm py-xs text-label-sm font-label-sm transition-colors flex items-center gap-xs">
+                <span class="material-symbols-outlined text-[14px]">undo</span>
+                Revert
+            </button>
+            <button id="tooltip-accept-btn" class="bg-primary text-on-primary rounded px-sm py-xs text-label-sm font-label-sm hover:opacity-90 active:scale-95 transition-all">
+                Accept
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-900 dark:bg-slate-800 text-white px-md py-sm rounded-lg shadow-xl text-body-sm font-medium z-50 flex items-center gap-sm transform translate-y-20 opacity-0 transition-all duration-300">
+        <span class="material-symbols-outlined text-primary text-[20px]" id="toast-icon">check_circle</span>
+        <span id="toast-text">Success message</span>
+    </div>
+
+    <!-- MAIN APP SCRIPT -->
+    <script>
+        // State management
+        const state = {
+            inputText: "",
+            outputText: "",
+            mode: "standard", // standard, fluency, formal, academic
+            isLoading: false,
+            errorMessage: "",
+            apiConfig: {
+                provider: "demo",
+                apiKey: "",
+                endpoint: "",
+                model: "gpt-4o-mini"
+            },
+            edits: []
+        };
+
+        // Grammar engine rules
+        const RULES = {
+            standard: [
+                { pattern: /\bhello sir today i want to present our ai autocorect tool which can fix grammer spelling and improve sentence fluency using openai api\b[.?]?/gi, replace: "Hello Sir,\n\nToday, I want to present our AI autocorrect tool, which can fix grammar, spelling, and improve sentence fluency using the OpenAI API.", explanation: "Punctuation & Flow", desc: "Capitalize greetings, format greeting with double newlines, add parenthetical comma before 'which', and insert commas to separate items in a list." },
+                { pattern: /\bhello how are you i hope you are doing well\b[.?]?/gi, replace: "Hello, how are you? I hope you are doing well.", explanation: "Punctuation & Capitalization", desc: "Capitalize the first word and add appropriate punctuation between sentences." },
+                { pattern: /\bhey bro can u send me the files asap\b[.?]?/gi, replace: (match) => {
+                    if (state.mode === 'formal' || state.mode === 'academic') {
+                        return "Could you please send me the files as soon as possible?";
+                    }
+                    return "Hey bro, can you send me the files as soon as possible?";
+                }, explanation: "Professional Rephrasing", desc: "Replace informal slang and abbreviations with professional phrasing." },
+                { pattern: /\bArtificial inteligence is changing the world very fast it help peoples in healthcare education and business but sometime peoples are afraid that ai will replace human jobs\b[.?]?/gi, replace: "Artificial intelligence is changing the world very fast. It helps people in healthcare, education, and business, but sometimes people are afraid that AI will replace human jobs.", explanation: "Syntax & Punctuation", desc: "Correct spelling of 'intelligence', subject-verb agreement of 'helps', pluralization of 'people', and add sentence punctuation." },
+                { pattern: /\bThe movie was good but I not enjoyed it very much because story was slow\b[.?]?/gi, replace: "The movie was good, but I did not enjoy it very much because the story was slow.", explanation: "Fluency & Articles", desc: "Insert the auxiliary verb 'did', change 'enjoyed' to base form 'enjoy', add a comma before coordinating conjunction 'but', and insert missing article 'the' before 'story'." },
+                { pattern: /\bMachine learning are one of the most important technology in todays world\b[.?]?/gi, replace: "Machine learning is one of the most important technologies in today's world.", explanation: "Subject-Verb & Pluralization", desc: "Correct verb agreement 'is', use plural noun 'technologies' after 'one of the', and add possessive apostrophe to 'today's'." },
+                { pattern: /\bplz snd me ur assingmnt befor tomrw mrng\b[.?]?/gi, replace: "Please send me your assignment before tomorrow morning.", explanation: "Slang Translation", desc: "Translate slang abbreviations and spelling typos to full formal words." },
+                { pattern: /\bkal mai college nahi aya because meri tabiyat kharab thi\b[.?]?/gi, replace: (match) => {
+                    if (state.mode === 'formal' || state.mode === 'academic' || state.mode === 'fluency') {
+                        return "I could not come to college yesterday because I was unwell.";
+                    }
+                    return "Kal main college nahi aaya because meri tabiyat kharab thi.";
+                }, explanation: "Language Translation", desc: "Translate Hinglish phrase into formal English or correct its spelling/punctuation." },
+                { pattern: /\brespected sir i am unable to attend the class due to fever kindly grant me leave\b[.?]?/gi, replace: "Respected Sir,\n\nI am unable to attend the class due to a fever. Kindly grant me leave.", explanation: "Formal Email Structure", desc: "Capitalize greetings, insert paragraph spacing, and correct prepositional syntax." },
+                { pattern: /\bAlthough the project was difficult but we completed it successfully with the help of our mentor\b[.?]?/gi, replace: "Although the project was difficult, we completed it successfully with the help of our mentor.", explanation: "Conjunction Redundancy", desc: "Remove the redundant coordinating conjunction 'but' when using the subordinating conjunction 'Although'." },
+                { pattern: /\bOur company make softwares which helps customer to improve there productivity\b[.?]?/gi, replace: "Our company develops software that helps customers improve their productivity.", explanation: "Vocabulary & Concord", desc: "Use professional verb 'develops', treat 'software' as uncountable, correct pronoun reference to plural 'customers', and correct homophone 'their'." },
+                { pattern: /\bai\b/g, replace: "AI", explanation: "Capitalization", desc: "Capitalize abbreviation 'AI'." },
+                { pattern: /\bopenai\b/gi, replace: "OpenAI", explanation: "Capitalization", desc: "Capitalize company name 'OpenAI'." },
+                { pattern: /\bapi\b/gi, replace: "API", explanation: "Capitalization", desc: "Capitalize abbreviation 'API'." },
+                { pattern: /\bhe go\b/gi, replace: "he goes", explanation: "Subject-Verb Agreement", desc: "Use 'goes' for third-person singular subject agreement." },
+                { pattern: /\bshe go\b/gi, replace: "she goes", explanation: "Subject-Verb Agreement", desc: "Use 'goes' for third-person singular subject agreement." },
+                { pattern: /\bi am teacher\b/gi, replace: "I am a teacher", explanation: "Missing Article", desc: "Add indefinite article 'a' before singular noun 'teacher'." },
+                { pattern: /\b(she|he|it) don'?t (\w+)\b/gi, replace: (match, p1, p2) => {
+                    let verb = p2;
+                    const lowerVerb = verb.toLowerCase();
+                    if (lowerVerb === "has") {
+                        verb = "have";
+                    } else if (verb.endsWith("s") && verb.length > 3) {
+                        verb = verb.slice(0, -1);
+                    }
+                    // Match capitalization of pronoun
+                    let pronoun = p1;
+                    if (p1[0] === p1[0].toUpperCase()) {
+                        pronoun = p1.charAt(0).toUpperCase() + p1.slice(1);
+                    }
+                    return `${pronoun} doesn't ${verb}`;
+                }, explanation: "Subject-Verb Agreement", desc: "Use 'doesn't' (does not) followed by the base form of the verb for third-person singular subjects." },
+                { pattern: /\bmore better\b/gi, replace: "better", explanation: "Double Comparative", desc: "Remove redundant comparative modifier 'more' before comparative adjective." },
+                { pattern: /\byour welcome\b/gi, replace: "you're welcome", explanation: "Homophone Error", desc: "Use 'you're' (you are) instead of possessive 'your'." },
+                { pattern: /\bthere car\b/gi, replace: "their car", explanation: "Homophone Error", desc: "Use possessive 'their' to indicate ownership instead of 'there'." },
+                { pattern: /\bits a beautiful day\b/gi, replace: "it's a beautiful day", explanation: "Contraction Error", desc: "Use contraction 'it's' (it is) instead of the possessive 'its'." },
+                { pattern: /\byesterday (i|he|she|we|they|people) go (.*?) and buy\b/gi, replace: (match, p1, p2) => {
+                    let subject = p1;
+                    if (subject.toLowerCase() === "i") subject = "I";
+                    return `Yesterday ${subject} went ${p2} and bought`;
+                }, explanation: "Tense Agreement", desc: "Correct coordinated verbs to past tense ('went' and 'bought') following past temporal marker 'Yesterday'." },
+                { pattern: /\byesterday (i|he|she|we|they) go\b/gi, replace: (match, p1) => {
+                    let subject = p1;
+                    if (subject.toLowerCase() === "i") subject = "I";
+                    return `Yesterday ${subject} went`;
+                }, explanation: "Tense Agreement", desc: "Use past tense verb 'went' for action completed in the past." },
+                { pattern: /\bthey was\b/gi, replace: "they were", explanation: "Subject-Verb Agreement", desc: "Use plural past tense 'were' for plural subject pronoun 'they'." },
+                { pattern: /\bwe was\b/gi, replace: "we were", explanation: "Subject-Verb Agreement", desc: "Use plural past tense 'were' for plural subject pronoun 'we'." },
+                { pattern: /\byou is\b/gi, replace: "you are", explanation: "Subject-Verb Agreement", desc: "Use the plural verb 'are' with the pronoun 'you'." },
+                { pattern: /\bthey is\b/gi, replace: "they are", explanation: "Subject-Verb Agreement", desc: "Use the plural verb 'are' with the plural pronoun 'they'." },
+                { pattern: /\bwe is\b/gi, replace: "we are", explanation: "Subject-Verb Agreement", desc: "Use the plural verb 'are' with the plural pronoun 'we'." },
+                { pattern: /\bi is\b/gi, replace: "I am", explanation: "Subject-Verb Agreement", desc: "Use singular verb 'am' with personal pronoun 'I'." },
+                { pattern: /\b(he|she|it) are\b/gi, replace: (match) => {
+                    const pronoun = match.split(/\s+/)[0];
+                    return pronoun + " is";
+                }, explanation: "Subject-Verb Agreement", desc: "Use singular verb 'is' with third-person singular pronouns." },
+                { pattern: /\byou was\b/gi, replace: "you were", explanation: "Subject-Verb Agreement", desc: "Use plural past verb 'were' with pronoun 'you'." },
+                { pattern: /\bbest place of university\b/gi, replace: "best place in the university", explanation: "Preposition Choice", desc: "Use preposition 'in the' instead of 'of' for location context." },
+                { pattern: /\b(recieve|seperate|untill|occured|accomodate|definitly|goverment|enviroment|freind|wierd|truely|comming|writting|succesful|neccessary|necessery|embaras|calender|arguement|enginer|ths|relly)\b/gi, replace: (match) => {
+                    const map = {
+                        recieve: "receive", seperate: "separate", untill: "until", occured: "occurred",
+                        accomodate: "accommodate", definitly: "definitely", goverment: "government",
+                        enviroment: "environment", freind: "friend", wierd: "weird", truely: "truly",
+                        comming: "coming", writting: "writing", succesful: "successful",
+                        neccessary: "necessary", necessery: "necessary", embaras: "embarrass",
+                        calender: "calendar", arguement: "argument", enginer: "engineer",
+                        ths: "this", relly: "really"
+                    };
+                    return map[match.toLowerCase()];
+                }, explanation: "Spelling Correction", desc: "Correct the misspelled word to its standard form." },
+                { pattern: /\bi write code good\b/gi, replace: "I write code well", explanation: "Adverb Usage", desc: "Use adverb 'well' instead of adjective 'good' to describe verb action." },
+                { pattern: /\bcould of\b/gi, replace: "could have", explanation: "Auxiliary Verb", desc: "Use 'could have' to indicate capability in the past instead of 'could of'." },
+                { pattern: /\bshould of\b/gi, replace: "should have", explanation: "Auxiliary Verb", desc: "Use 'should have' to indicate obligation in the past instead of 'should of'." },
+                { pattern: /\bwould of\b/gi, replace: "would have", explanation: "Auxiliary Verb", desc: "Use 'would have' to indicate hypothetical action in the past instead of 'would of'." },
+                { pattern: /\b(cant|wont|dont|didnt|shant|hasnt|havent|hadnt|isnt|arent|wasnt|werent)\b/gi, replace: (match) => {
+                    const map = { cant: "can't", wont: "won't", dont: "don't", didnt: "didn't", shant: "shan't", hasnt: "hasn't", havent: "haven't", hadnt: "hadn't", isnt: "isn't", arent: "aren't", wasnt: "wasn't", werent: "weren't" };
+                    return map[match.toLowerCase()];
+                }, explanation: "Missing Apostrophe", desc: "Add the missing apostrophe to correctly format the contraction." },
+                { pattern: /\bi\b/g, replace: "I", explanation: "Capitalization", desc: "Capitalize the personal pronoun 'I'." }
+            ],
+            fluency: [
+                { pattern: /\bin order to\b/gi, replace: "to", explanation: "Wordiness", desc: "Simplify 'in order to' to a single preposition 'to' for concise reading." },
+                { pattern: /\bdue to the fact that\b/gi, replace: "because", explanation: "Wordiness", desc: "Replace wordy phrase with a direct, stronger causal conjunction." },
+                { pattern: /\bvery unique\b/gi, replace: "unique", explanation: "Redundancy", desc: "'Unique' means one of a kind and is absolute; it cannot be modified." },
+                { pattern: /\beach and every\b/gi, replace: "each", explanation: "Redundancy", desc: "Remove redundant word pairing; select a single pronoun." },
+                { pattern: /\bat this point in time\b/gi, replace: "currently", explanation: "Wordiness", desc: "Use a concise temporal adverb instead of an unnecessary phrase." },
+                { pattern: /\babsolutely essential\b/gi, replace: "essential", explanation: "Redundancy", desc: "'Essential' implies absolute necessity; the modifier is redundant." },
+                { pattern: /\bbring to an end\b/gi, replace: "end", explanation: "Wordiness", desc: "Simplify the helper verb construction into a direct active verb." }
+            ],
+            formal: [
+                { pattern: /\bkids\b/gi, replace: "children", explanation: "Formal Vocabulary", desc: "Use formal term 'children' instead of casual colloquialism 'kids'." },
+                { pattern: /\bcool\b/gi, replace: "sophisticated", explanation: "Formal Vocabulary", desc: "Select a formal adjective matching standard professional contexts." },
+                { pattern: /\bget\b/gi, replace: "obtain", explanation: "Formal Vocabulary", desc: "Use 'obtain' or 'receive' instead of casual conversational verb 'get'." },
+                { pattern: /\bstuff\b/gi, replace: "materials", explanation: "Vague Vocabulary", desc: "Use a specific, elevated noun to describe components or items." },
+                { pattern: /\bcheck out\b/gi, replace: "examine", explanation: "Phrasal Verb", desc: "Replace phrasal verb with formal equivalent 'examine'." },
+                { pattern: /\bask for\b/gi, replace: "request", explanation: "Phrasal Verb", desc: "Replace phrasal verb with formal equivalent 'request'." },
+                { pattern: /\bdeal with\b/gi, replace: "handle", explanation: "Phrasal Verb", desc: "Replace casual phrasal verb with formal equivalent 'handle' or 'address'." },
+                { pattern: /\bgo up\b/gi, replace: "increase", explanation: "Phrasal Verb", desc: "Replace casual phrasal verb with formal equivalent 'increase'." },
+                { pattern: /\bgo down\b/gi, replace: "decrease", explanation: "Phrasal Verb", desc: "Replace casual phrasal verb with formal equivalent 'decrease'." },
+                { pattern: /\blook into\b/gi, replace: "investigate", explanation: "Phrasal Verb", desc: "Replace casual phrasal verb with formal equivalent 'investigate'." }
+            ],
+            academic: [
+                { pattern: /\b(don't|can't|won't|shouldn't|wouldn't|couldn't|isn't|aren't|wasn't|weren't|haven't|hasn't|hadn't)\b/gi, replace: (match) => {
+                    const map = {
+                        "don't": "do not", "can't": "cannot", "won't": "will not", "shouldn't": "should not",
+                        "wouldn't": "would not", "couldn't": "could not", "isn't": "is not", "aren't": "are not",
+                        "wasn't": "was not", "weren't": "were not", "haven't": "have not", "hasn't": "have not",
+                        "hadn't": "had not"
+                    };
+                    return map[match.toLowerCase()];
+                }, explanation: "Academic Contraction", desc: "Avoid contractions in formal academic prose. Write out full helper verbs." },
+                { pattern: /\bshow\b/gi, replace: "demonstrate", explanation: "Academic Vocabulary", desc: "Replace basic verb with scholarly equivalent 'demonstrate'." },
+                { pattern: /\bthink\b/gi, replace: "hypothesize", explanation: "Academic Vocabulary", desc: "Use elevated verb 'hypothesize' or 'posit' for intellectual actions." },
+                { pattern: /\buse\b/gi, replace: "utilize", explanation: "Academic Vocabulary", desc: "Select academic synonym 'utilize' to express application." },
+                { pattern: /\babout\b/gi, replace: "approximately", explanation: "Academic Precision", desc: "Use quantitative descriptor 'approximately' instead of conversational 'about'." },
+                { pattern: /\ba lot of\b/gi, replace: "numerous", explanation: "Academic Quantifier", desc: "Use exact descriptor 'numerous' or 'multitudinous'." },
+                { pattern: /\bbad\b/gi, replace: "adverse", explanation: "Academic Vocabulary", desc: "Elevate adjective 'bad' to analytical 'adverse' or 'suboptimal'." },
+                { pattern: /\bbig\b/gi, replace: "significant", explanation: "Academic Vocabulary", desc: "Elevate descriptive size to quantitative descriptor 'significant'." }
+            ]
+        };
+
+        // DOM elements
+        const inputArea = document.getElementById('input-editor');
+        const outputView = document.getElementById('output-view');
+        const counter = document.getElementById('char-count');
+        const enhanceBtn = document.getElementById('enhance-btn');
+        const clearBtn = document.getElementById('clear-btn');
+        const copyBtn = document.getElementById('copy-btn');
+        const themeToggle = document.getElementById('theme-toggle');
+        const errorBanner = document.getElementById('error-banner');
+        const errorMessageText = document.getElementById('error-message-text');
+        const closeErrorBtn = document.getElementById('close-error-btn');
+
+        // Initial setup
+        window.addEventListener('DOMContentLoaded', () => {
+            loadSettings();
+            loadHistory();
+            initTheme();
+            setWritingMode('standard');
+            inputArea.focus();
+        });
+
+        // 1. Theme Configuration
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const html = document.documentElement;
+            const themeIcon = themeToggle.querySelector('.material-symbols-outlined');
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                if (themeIcon) themeIcon.textContent = 'light_mode';
+            } else {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                if (themeIcon) themeIcon.textContent = 'dark_mode';
+            }
+        }
+
+        if (themeToggle) {
+            themeToggle.addEventListener('click', () => {
+                const html = document.documentElement;
+                const icon = themeToggle.querySelector('.material-symbols-outlined');
+                
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    html.classList.add('light');
+                    localStorage.setItem('theme', 'light');
+                    icon.textContent = 'dark_mode';
+                } else {
+                    html.classList.remove('light');
+                    html.classList.add('dark');
+                    localStorage.setItem('theme', 'dark');
+                    icon.textContent = 'light_mode';
+                }
+            });
+        }
+
+        // 2. Resizable Split-Screen Workspace (Pointer & Touch Events)
+        const divider = document.querySelector('.split-divider');
+        const leftPanel = document.getElementById('input-panel');
+        const rightPanel = document.getElementById('output-panel');
+        const container = leftPanel ? leftPanel.parentElement : null;
+
+        if (divider && leftPanel && rightPanel && container) {
+            let isDragging = false;
+
+            const startDrag = (e) => {
+                isDragging = true;
+                divider.classList.add('dragging');
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+                hideTooltip();
+            };
+
+            const doDrag = (clientX) => {
+                if (!isDragging) return;
+                const containerRect = container.getBoundingClientRect();
+                const relativeX = clientX - containerRect.left;
+                let percentage = (relativeX / containerRect.width) * 100;
+                
+                // Constraints (min 20%, max 80%)
+                if (percentage < 20) percentage = 20;
+                if (percentage > 80) percentage = 80;
+
+                leftPanel.style.flex = `0 0 ${percentage}%`;
+                rightPanel.style.flex = `0 0 ${100 - percentage}%`;
+            };
+
+            const stopDrag = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                divider.classList.remove('dragging');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            };
+
+            divider.addEventListener('mousedown', (e) => {
+                startDrag();
+                e.preventDefault();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    doDrag(e.clientX);
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                stopDrag();
+            });
+
+            // Touch events for tablets
+            divider.addEventListener('touchstart', (e) => {
+                if (e.touches.length > 0) {
+                    startDrag();
+                }
+            });
+
+            document.addEventListener('touchmove', (e) => {
+                if (isDragging && e.touches.length > 0) {
+                    doDrag(e.touches[0].clientX);
+                }
+            });
+
+            document.addEventListener('touchend', () => {
+                stopDrag();
+            });
+        }
+
+        // 3. Live Counters, Clear, and Copy
+        inputArea.addEventListener('input', (e) => {
+            const text = e.target.value;
+            state.inputText = text;
+            const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+            const chars = text.length;
+            counter.textContent = `${words} words | ${chars} characters`;
+            
+            const spellcheck = document.getElementById('spellcheck-status');
+            if (spellcheck) {
+                spellcheck.textContent = text.trim() ? "Analyzing..." : "Ready";
+            }
+        });
+
+        clearBtn.addEventListener('click', () => {
+            inputArea.value = '';
+            state.inputText = '';
+            state.outputText = '';
+            inputArea.dispatchEvent(new Event('input'));
+            outputView.innerHTML = `<p class="text-on-surface-variant dark:text-slate-500 italic">Enhanced text will appear here after clicking "Fix Text"...</p>`;
+            inputArea.focus();
+            hideTooltip();
+        });
+
+        if (copyBtn) {
+            copyBtn.addEventListener('click', async () => {
+                // Ignore the initial placeholder and copy only corrected text
+                const isPlaceholder = outputView.querySelector('p.italic') !== null;
+                if (isPlaceholder) return;
+
+                // Extract visible text (inner text of output view, avoiding tooltip elements)
+                // Use a separate clone to extract clean text if tooltip is accidentally inside, 
+                // but tooltip is placed at the body level so innerText is already clean text!
+                const textToCopy = outputView.innerText || outputView.textContent;
+                
+                if (!textToCopy.trim()) return;
+
+                try {
+                    await navigator.clipboard.writeText(textToCopy);
+                    
+                    const textSpan = copyBtn.querySelector('span:not(.material-symbols-outlined)');
+                    const iconSpan = copyBtn.querySelector('.material-symbols-outlined');
+                    
+                    const originalText = textSpan.textContent;
+                    const originalIcon = iconSpan.textContent;
+                    
+                    textSpan.textContent = "Copied!";
+                    iconSpan.textContent = "done";
+                    copyBtn.classList.add('text-[#00A86B]');
+                    
+                    setTimeout(() => {
+                        textSpan.textContent = originalText;
+                        iconSpan.textContent = originalIcon;
+                        copyBtn.classList.remove('text-[#00A86B]');
+                    }, 2000);
+                } catch (err) {
+                    console.error('Clipboard write failed:', err);
+                    showToast('Failed to copy to clipboard', 'error');
+                }
+            });
+        }
+
+        // 4. Writing Mode Switching (Sidebar and Mobile Sync)
+        function setWritingMode(mode) {
+            state.mode = mode;
+            
+            // Sync sidebar buttons
+            const sidebarButtons = document.querySelectorAll('.sidebar-mode-btn');
+            sidebarButtons.forEach(btn => {
+                const btnMode = btn.getAttribute('data-mode');
+                if (btnMode === mode) {
+                    btn.className = "sidebar-mode-btn flex items-center gap-sm p-sm bg-[#00A86B]/15 text-[#00A86B] dark:bg-[#00A86B]/25 rounded-lg transition-all duration-200 font-semibold";
+                } else {
+                    btn.className = "sidebar-mode-btn flex items-center gap-sm p-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800/60 rounded-lg transition-all duration-200";
+                }
+            });
+
+            // Sync mobile chips
+            const mobileChips = document.querySelectorAll('.mobile-chip');
+            mobileChips.forEach(chip => {
+                const chipMode = chip.getAttribute('data-mode');
+                if (chipMode === mode) {
+                    chip.className = "mobile-chip px-md py-xs border border-[#00A86B] text-[#00A86B] bg-[#00A86B]/10 rounded-full text-label-sm font-label-sm whitespace-nowrap font-medium";
+                } else {
+                    chip.className = "mobile-chip px-md py-xs border border-surface-variant dark:border-slate-700 text-on-surface-variant dark:text-slate-400 rounded-full text-label-sm font-label-sm whitespace-nowrap";
+                }
+            });
+        }
+
+        document.querySelectorAll('.sidebar-mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                setWritingMode(btn.getAttribute('data-mode'));
+            });
+        });
+
+        document.querySelectorAll('.mobile-chip').forEach(chip => {
+            chip.addEventListener('click', () => {
+                setWritingMode(chip.getAttribute('data-mode'));
+            });
+        });
+
+        // 5. Settings Modal (API config)
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsForm = document.getElementById('settings-form');
+        const providerSelect = document.getElementById('api-provider');
+
+        function loadSettings() {
+            const provider = localStorage.getItem('alpha_correct_provider') || 'backend';
+            const apiKey = localStorage.getItem('alpha_correct_api_key') || '';
+            const endpoint = localStorage.getItem('alpha_correct_api_endpoint') || 'https://api.openai.com/v1/chat/completions';
+            const model = localStorage.getItem('alpha_correct_model') || 'gpt-4o-mini';
+
+            state.apiConfig = { provider, apiKey, endpoint, model };
+
+            // Update form controls
+            providerSelect.value = provider;
+            document.getElementById('api-key').value = apiKey;
+            document.getElementById('api-endpoint').value = endpoint;
+            document.getElementById('api-model').value = model;
+
+            updateSettingsFormVisibility(provider);
+        }
+
+        function updateSettingsFormVisibility(provider) {
+            const keyContainer = document.getElementById('api-key-container');
+            const endpointContainer = document.getElementById('api-endpoint-container');
+            const modelContainer = document.getElementById('api-model-container');
+
+            if (provider === 'demo' || provider === 'backend') {
+                keyContainer.classList.add('hidden');
+                endpointContainer.classList.add('hidden');
+                modelContainer.classList.add('hidden');
+            } else if (provider === 'openai') {
+                keyContainer.classList.remove('hidden');
+                endpointContainer.classList.add('hidden');
+                modelContainer.classList.remove('hidden');
+            } else if (provider === 'custom') {
+                keyContainer.classList.remove('hidden');
+                endpointContainer.classList.remove('hidden');
+                modelContainer.classList.remove('hidden');
+            }
+        }
+
+        providerSelect.addEventListener('change', (e) => {
+            updateSettingsFormVisibility(e.target.value);
+        });
+
+        const showSettings = () => {
+            loadSettings();
+            settingsModal.classList.remove('hidden');
+            setTimeout(() => {
+                settingsModal.classList.remove('opacity-0');
+                settingsModal.querySelector('div').classList.remove('scale-95');
+            }, 10);
+        };
+
+        const hideSettings = () => {
+            settingsModal.classList.add('opacity-0');
+            settingsModal.querySelector('div').classList.add('scale-95');
+            setTimeout(() => {
+                settingsModal.classList.add('hidden');
+            }, 300);
+        };
+
+        document.getElementById('nav-settings').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSettings();
+        });
+
+        document.getElementById('side-settings').addEventListener('click', (e) => {
+            e.preventDefault();
+            showSettings();
+        });
+
+        document.getElementById('close-settings-btn').addEventListener('click', hideSettings);
+        document.getElementById('cancel-settings-btn').addEventListener('click', hideSettings);
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) hideSettings();
+        });
+
+        // Toggle Key Visibility
+        document.getElementById('toggle-key-visibility').addEventListener('click', () => {
+            const keyInput = document.getElementById('api-key');
+            const icon = document.getElementById('toggle-key-visibility').querySelector('.material-symbols-outlined');
+            if (keyInput.type === 'password') {
+                keyInput.type = 'text';
+                icon.textContent = 'visibility_off';
+            } else {
+                keyInput.type = 'password';
+                icon.textContent = 'visibility';
+            }
+        });
+
+        settingsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const provider = providerSelect.value;
+            const apiKey = document.getElementById('api-key').value;
+            const endpoint = document.getElementById('api-endpoint').value;
+            const model = document.getElementById('api-model').value;
+
+            localStorage.setItem('alpha_correct_provider', provider);
+            localStorage.setItem('alpha_correct_api_key', apiKey);
+            localStorage.setItem('alpha_correct_api_endpoint', endpoint);
+            localStorage.setItem('alpha_correct_api_model', model);
+
+            state.apiConfig = { provider, apiKey, endpoint, model };
+            hideSettings();
+            showToast("Settings saved successfully.");
+        });
+
+        // 6. Modern Red Error Banner
+        function showErrorBanner(message) {
+            errorMessageText.textContent = message;
+            errorBanner.classList.remove('-translate-y-full');
+            errorBanner.classList.add('translate-y-0');
+
+            clearTimeout(errorBanner.timeoutId);
+            errorBanner.timeoutId = setTimeout(() => {
+                hideErrorBanner();
+            }, 6000);
+        }
+
+        function hideErrorBanner() {
+            errorBanner.classList.remove('translate-y-0');
+            errorBanner.classList.add('-translate-y-full');
+        }
+
+        closeErrorBtn.addEventListener('click', hideErrorBanner);
+
+        // Toast message utility
+        function showToast(message, icon = 'check_circle') {
+            const toast = document.getElementById('toast-notification');
+            const toastText = document.getElementById('toast-text');
+            const toastIcon = document.getElementById('toast-icon');
+
+            toastText.textContent = message;
+            toastIcon.textContent = icon;
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        // 7. API Integration Fetch Function (Real AI Call with Structured JSON response)
+        async function fetchAIResponse(text, mode, config) {
+            const systemPrompt = `You are a high-precision grammar and writing assistant like QuillBot.
+You enhance text for the following writing mode: "${mode.toUpperCase()}".
+Your goal is to correct all spelling, grammar, and phrasing issues while adhering to the mode guidelines:
+- STANDARD: Correct spelling, grammar, punctuation, and capitalization. Maintain simple, clear sentences.
+- FLUENCY: Correct errors and rephrase sentences slightly to improve readability and flow.
+- FORMAL: Elevate casual language, replace phrasal verbs, and maintain a highly professional tone.
+- ACADEMIC: Remove contractions, use rigorous academic terminology, and ensure objective tone.
+
+Return the result as a raw JSON object matching this schema. Do not output markdown code blocks or any conversational text.
+{
+  "correctedText": "string representing the complete updated paragraph with corrections applied",
+  "edits": [
+    {
+      "original": "string representing the exact wrong text segment in the original input that is corrected",
+      "corrected": "string representing the corrected text segment replacement",
+      "explanation": "short title of error e.g. Subject-Verb Agreement",
+      "desc": "longer description of why the change was made"
+    }
+  ]
+}
+Note: Ensure "original" matches exactly a substring in the input text. If no changes are needed, return an empty "edits" list and the original text in "correctedText".`;
+
+            const response = await fetch(config.endpoint || 'https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${config.apiKey}`
+                },
+                body: JSON.stringify({
+                    model: config.model || 'gpt-4o-mini',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        { role: 'user', content: text }
+                    ],
+                    response_format: { type: "json_object" },
+                    temperature: 0.3
+                })
+            });
+
+            if (!response.ok) {
+                const errData = await response.json().catch(() => ({}));
+                throw new Error(errData.error?.message || `HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            const result = JSON.parse(data.choices[0].message.content);
+            return result;
+        }
+
+        // Levenshtein distance calculation for spell check
+        function getLevenshteinDistance(a, b) {
+            if (a.length === 0) return b.length;
+            if (b.length === 0) return a.length;
+
+            const matrix = [];
+            for (let i = 0; i <= b.length; i++) {
+                matrix[i] = [i];
+            }
+            for (let j = 0; j <= a.length; j++) {
+                matrix[0][j] = j;
+            }
+
+            for (let i = 1; i <= b.length; i++) {
+                for (let j = 1; j <= a.length; j++) {
+                    if (b.charAt(i - 1) === a.charAt(j - 1)) {
+                        matrix[i][j] = matrix[i - 1][j - 1];
+                    } else {
+                        matrix[i][j] = Math.min(
+                            matrix[i - 1][j - 1] + 1, // substitution
+                            Math.min(
+                                matrix[i][j - 1] + 1, // insertion
+                                matrix[i - 1][j] + 1  // deletion
+                            )
+                        );
+                    }
+                }
+            }
+            return matrix[b.length][a.length];
+        }
+
+        // Comprehensive list of common English words to prevent false positive spellchecks
+        const DICTIONARY = [
+            "a", "aa", "ability", "able", "about", "above", "abstract", "abuse", "ac", "academic", "academy", "acc", "accept", "acceptance", "accepted", "access", "accessories", "accommodation", "according", "account", "accounting", "accounts", "accuracy", "achieve", "acid", "across", "act", "action", "actions", "active", "activities", "activity", "actual", "actually", "ad", "add", "added", "adding", "addition", "additional", "address", "addresses", "admin", "administration", "administrative", "administrator", "adobe", "ads", "adult", "adults", "advance", "advanced", "advantage", "adventure", "advertise", "advertisement", "advertising", "advice", "advisor", "affairs", "affiliate", "affiliates", "afraid", "africa", "african", "after", "again", "against", "age", "agencies", "agency", "agent", "agents", "ago", "agree", "agreed", "agreement", "agriculture", "ahead", "aid", "aids", "aim", "air", "airport", "al", "alabama", "alaska", "album", "alert", "all", "allow", "allowed", "allows", "almost", "alone", "along", "alpha", "already", "also", "alternative", "although", "always", "am", "amateur", "amazing", "amazon", "amendment", "america", "american", "americans", "among", "amount", "amounts", "an", "analysis", "and", "andrew", "angel", "angeles", "animal", "animals", "anime", "ann", "announced", "announcements", "annual", "anonymous", "another", "answer", "answers", "anti", "any", "anyone", "anything", "ap", "apartment", "apartments", "api", "apparel", "appeal", "appear", "appears", "apple", "applicable", "application", "applications", "applied", "apply", "approach", "appropriate", "approval", "approved", "approximately", "apr", "april", "ar", "architecture", "archive", "archives", "are", "area", "areas", "argument", "arizona", "arms", "army", "around", "art", "article", "articles", "artificial", "artist", "artists", "arts", "as", "asia", "asian", "ask", "asked", "aspects", "assembly", "assessment", "assets", "assignment", "assignments", "assist", "assistance", "assistant", "associate", "associated", "associates", "association", "at", "atlanta", "atom", "attack", "attend", "attending", "attention", "attorney", "au", "auction", "auctions", "audio", "aug", "august", "austin", "australia", "australian", "austria", "author", "authority", "authors", "auto", "autocorrect", "autocorrected", "autocorrecting", "automatic", "automatically", "automotive", "availability", "available", "ave", "avenue", "average", "avg", "avoid", "award", "awards", "aware", "away", "az", "babes", "baby", "back", "background", "bad", "bag", "bags", "balance", "ball", "band", "bank", "banking", "banks", "bar", "bars", "base", "baseball", "based", "basic", "basis", "basket", "basketball", "bass", "bath", "batteries", "battery", "battle", "bay", "bbc", "bc", "be", "beach", "bear", "beat", "beautiful", "beauty", "became", "because", "become", "becomes", "bed", "bedroom", "been", "before", "began", "begin", "beginning", "behavior", "behind", "being", "believe", "below", "benefit", "benefits", "best", "beta", "better", "between", "beyond", "bible", "bid", "bids", "big", "bill", "billion", "bin", "binding", "bird", "birth", "birthday", "bit", "black", "block", "blog", "blogs", "blood", "blow", "blue", "board", "boards", "boat", "bob", "body", "bonus", "book", "bookmark", "books", "born", "boston", "both", "bottom", "bought", "box", "boxes", "boy", "boys", "brain", "branch", "brand", "brands", "brazil", "break", "breakfast", "breaking", "breast", "brian", "bridge", "brief", "bring", "british", "broadband", "broken", "brother", "brought", "brown", "browse", "browser", "budget", "bug", "build", "building", "buildings", "built", "bureau", "bus", "bush", "business", "businesses", "but", "button", "buy", "buyer", "buying", "by", "bytes", "ca", "cable", "calendar", "california", "call", "called", "calling", "calls", "came", "camera", "cameras", "camp", "campaign", "campus", "can", "canada", "canadian", "cancer", "canon", "cap", "capacity", "cape", "capital", "car", "card", "cards", "care", "career", "careers", "carolina", "carried", "carry", "cars", "cart", "case", "cases", "cash", "casino", "cast", "cat", "catalog", "categories", "category", "cause", "caused", "cc", "cd", "cds", "cell", "cells", "census", "cent", "center", "centers", "central", "centre", "century", "certain", "certainly", "certificate", "certificates", "certification", "certified", "ch", "chain", "chair", "chairman", "challenge", "chance", "change", "changed", "changes", "changing", "channel", "chapter", "character", "characters", "charge", "charges", "charles", "chart", "charts", "chat", "cheap", "check", "checkout", "chemical", "chicago", "chief", "child", "children", "china", "chinese", "choice", "choose", "chris", "christ", "christian", "christmas", "church", "circuit", "cisco", "cities", "city", "civil", "claim", "claims", "class", "classes", "classic", "classical", "classifieds", "clean", "cleaning", "clear", "clearly", "click", "client", "clients", "clinical", "clip", "clips", "clock", "close", "closed", "clothes", "clothing", "club", "clubs", "cm", "cnet", "co", "coast", "code", "codes", "coffee", "cold", "collectibles", "collection", "college", "color", "colorado", "colors", "colour", "columbia", "column", "com", "combination", "combined", "come", "comes", "comfort", "comics", "coming", "command", "comment", "comments", "commerce", "commercial", "commission", "committee", "common", "communication", "communications", "communities", "community", "compact", "companies", "company", "compare", "compared", "comparison", "compatible", "competition", "competitive", "complete", "completed", "completely", "complex", "compliance", "component", "components", "comprehensive", "computer", "computers", "computing", "con", "concept", "concerned", "concerns", "condition", "conditions", "conduct", "conference", "configuration", "congress", "connect", "connected", "connection", "conservation", "consider", "considered", "constitutes", "construction", "consulting", "consumer", "contact", "contacts", "contain", "contained", "containing", "contains", "contemporary", "content", "contents", "context", "continue", "continued", "continuing", "contract", "control", "controls", "convention", "conversion", "cool", "copies", "copy", "copyright", "core", "corner", "corporate", "corporation", "correct", "correcting", "corrections", "corrector", "cost", "costs", "could", "council", "count", "counter", "countries", "country", "county", "couple", "course", "courses", "court", "cover", "coverage", "covered", "covers", "cream", "create", "created", "creating", "creation", "creative", "credit", "credits", "creek", "crime", "criminal", "criteria", "critical", "cross", "cruise", "crystal", "ct", "cultural", "culture", "cup", "currency", "current", "currently", "custom", "customer", "customers", "cut", "cvs", "cycle", "da", "daily", "dakota", "dallas", "damage", "dan", "dance", "daniel", "dark", "data", "database", "date", "dates", "dating", "daughter", "dave", "david", "davis", "day", "days", "dc", "de", "dead", "deal", "dealer", "deals", "death", "debt", "dec", "december", "decided", "decision", "decisions", "dedicated", "deep", "default", "defense", "define", "defined", "definition", "degree", "degrees", "del", "delete", "delivered", "delivery", "dell", "delta", "demand", "department", "departments", "depth", "des", "described", "description", "design", "designated", "designed", "designer", "designs", "desk", "desktop", "despite", "destination", "detail", "detailed", "details", "determine", "determined", "dev", "devel", "develop", "developed", "developer", "developers", "developing", "development", "develops", "device", "devices", "di", "diamond", "dictionary", "did", "die", "died", "diego", "diet", "diff", "difference", "different", "difficult", "digital", "dining", "dinner", "direct", "direction", "directions", "directly", "director", "directors", "directory", "disc", "disclaimer", "discount", "discover", "discuss", "discussion", "discussions", "disease", "disk", "disney", "display", "displayed", "distance", "distributed", "distribution", "district", "division", "dj", "dna", "do", "doc", "doctor", "document", "documentation", "documents", "does", "dog", "dogs", "doing", "dollar", "dollars", "domain", "domestic", "don", "done", "door", "dot", "double", "down", "download", "downloads", "dr", "draft", "dream", "dress", "drink", "drive", "driver", "drivers", "drives", "driving", "drop", "drug", "drugs", "dry", "dsl", "du", "dual", "due", "during", "duty", "dvd", "dvds", "dynamic", "each", "earlier", "early", "earth", "easier", "easily", "east", "eastern", "easy", "eat", "ebay", "economic", "economics", "economy", "ed", "edge", "edit", "edition", "editor", "editorial", "education", "educational", "effect", "effective", "effects", "effort", "efforts", "eg", "eight", "either", "el", "election", "electric", "electrical", "electronic", "electronics", "element", "elements", "eligible", "else", "em", "email", "emergency", "employee", "employees", "employment", "empty", "en", "enable", "encyclopedia", "end", "ended", "ending", "ends", "energy", "engine", "engineer", "engineering", "england", "english", "enjoy", "enlarge", "enough", "ensure", "enter", "enterprise", "enterprises", "entertainment", "entire", "entries", "entry", "environment", "environmental", "equal", "equipment", "equity", "eric", "error", "errors", "es", "especially", "essential", "est", "established", "estate", "estimated", "estimates", "et", "etc", "eu", "eur", "euro", "europe", "european", "evaluation", "even", "evening", "event", "events", "ever", "every", "everyone", "everything", "evidence", "evil", "evolution", "ex", "exactly", "example", "examples", "excellent", "except", "exchange", "exclusive", "executive", "exercise", "exist", "existing", "expect", "expected", "experience", "expert", "experts", "explore", "exposure", "express", "expression", "extended", "extension", "external", "extra", "extreme", "eye", "eyes", "face", "facilities", "facility", "fact", "factor", "factors", "factory", "facts", "faculty", "fail", "failed", "failure", "fair", "faith", "fall", "falls", "false", "families", "family", "famous", "fan", "fans", "fantasy", "faq", "faqs", "far", "farm", "fashion", "fast", "faster", "fat", "father", "favorite", "favorites", "fax", "fear", "feature", "featured", "features", "feb", "february", "federal", "fee", "feed", "feedback", "feeds", "feel", "feeling", "fees", "feet", "felt", "female", "festival", "fever", "few", "fi", "fiction", "field", "fields", "fight", "figure", "figures", "file", "filed", "files", "fill", "film", "films", "filter", "final", "finally", "finance", "financial", "find", "finding", "fine", "finish", "finished", "fire", "firm", "firms", "first", "fish", "fishing", "fit", "fitness", "five", "fix", "fixed", "fixes", "fixing", "fl", "flag", "flash", "flat", "flight", "flights", "floor", "florida", "flow", "flower", "flowers", "fluency", "fly", "focus", "follow", "followed", "following", "follows", "font", "food", "foot", "football", "for", "force", "forced", "forces", "ford", "forecast", "foreign", "forest", "forgot", "form", "format", "former", "forms", "fort", "forum", "forums", "forward", "found", "foundation", "four", "fourth", "fr", "frame", "frames", "framework", "france", "francisco", "frank", "free", "freedom", "french", "frequency", "frequently", "fresh", "fri", "friday", "friend", "friendly", "friends", "from", "front", "fruit", "fruits", "ft", "fuel", "full", "fully", "fun", "function", "functional", "functions", "fund", "funding", "funds", "funny", "furniture", "further", "future", "ga", "gain", "galleries", "gallery", "gambling", "game", "games", "gaming", "gamma", "garden", "gas", "gave", "gay", "gb", "gear", "gender", "gene", "general", "generally", "generated", "generation", "generic", "george", "georgia", "german", "germany", "get", "gets", "getting", "gift", "gifts", "girl", "girls", "give", "given", "gives", "giving", "glass", "global", "gmt", "go", "goal", "goals", "goes", "going", "gold", "golden", "golf", "gone", "good", "goods", "google", "got", "government", "gps", "grade", "graduate", "grammar", "grammars", "grand", "grant", "graphic", "graphics", "gratis", "great", "greater", "greatest", "green", "ground", "group", "groups", "grow", "growing", "growth", "guarantee", "guaranteed", "guess", "guest", "guide", "guidelines", "guides", "guitar", "guy", "guys", "had", "hair", "half", "hall", "hand", "handle", "handling", "hands", "happen", "happy", "hard", "hardware", "harry", "has", "have", "having", "hawaii", "he", "head", "headlines", "health", "healthcare", "healthy", "hear", "heard", "hearing", "heart", "heat", "heavy", "height", "held", "hello", "help", "helpful", "helps", "henry", "her", "here", "hey", "hi", "hidden", "hide", "high", "higher", "highest", "highly", "hill", "hills", "him", "himself", "hip", "hire", "his", "historical", "history", "hit", "hits", "hiv", "hold", "hole", "holiday", "holidays", "home", "homepage", "homes", "hong", "hope", "horse", "hospital", "host", "hosting", "hot", "hotel", "hotels", "hour", "hours", "house", "household", "houses", "housing", "houston", "how", "however", "hp", "hr", "html", "huge", "human", "hunter", "i", "ibm", "ice", "icon", "id", "idea", "ideal", "ideas", "identified", "identify", "identity", "ie", "if", "ii", "iii", "il", "ill", "illinois", "im", "image", "images", "immediately", "impact", "implementation", "import", "importance", "important", "improve", "improved", "improvement", "improves", "improving", "in", "inc", "inch", "inches", "include", "included", "includes", "including", "income", "increase", "increased", "increasing", "indeed", "independent", "index", "india", "indian", "indiana", "individual", "individuals", "industrial", "industries", "industry", "influence", "info", "information", "informed", "infrastructure", "initial", "injury", "ink", "inn", "input", "inside", "install", "installation", "installed", "instance", "instant", "instead", "institute", "institutions", "instructions", "instruments", "insurance", "int", "integrated", "integration", "intel", "intelligence", "intended", "interactive", "interest", "interested", "interesting", "interests", "interface", "interior", "internal", "international", "internet", "interracial", "interview", "into", "introduced", "introduction", "investment", "involved", "iowa", "ip", "ipod", "iraq", "ireland", "irish", "iron", "is", "isbn", "island", "islands", "israel", "issue", "issued", "issues", "it", "italian", "italy", "item", "items", "its", "itself", "iv", "jack", "jackson", "james", "jan", "january", "japan", "japanese", "java", "javascript", "jazz", "jersey", "jesus", "jewelry", "jim", "job", "jobs", "joe", "john", "johnson", "join", "joined", "joint", "jones", "joseph", "journal", "judge", "jul", "july", "jump", "jun", "june", "junior", "just", "justice", "kansas", "kb", "keep", "kelly", "kentucky", "kept", "key", "keyword", "keywords", "kids", "kind", "kinds", "king", "kingdom", "kit", "kitchen", "km", "knew", "know", "knowledge", "known", "kong", "korea", "la", "lab", "label", "labor", "laboratory", "lack", "ladies", "lady", "lake", "land", "language", "languages", "laptop", "large", "larger", "largest", "las", "laser", "last", "late", "later", "latest", "latin", "law", "laws", "lawyer", "lawyers", "layer", "lcd", "le", "lead", "leader", "leaders", "leadership", "leading", "leads", "league", "learn", "learning", "least", "leather", "leave", "led", "lee", "left", "legal", "legislation", "length", "les", "lesbian", "less", "let", "letter", "letters", "level", "levels", "liability", "libraries", "library", "license", "licensed", "life", "light", "lighting", "lights", "like", "likely", "limit", "limited", "line", "lines", "lingerie", "link", "links", "linux", "list", "listed", "listen", "listing", "listings", "lists", "literature", "little", "live", "lives", "living", "llc", "load", "loan", "loans", "local", "located", "location", "locations", "log", "logged", "login", "logo", "london", "long", "longer", "look", "looked", "looking", "looks", "lord", "los", "loss", "lost", "lot", "lots", "louis", "louisiana", "love", "low", "lower", "lowest", "ltd", "luxury", "lyrics", "ma", "mac", "machine", "machines", "made", "magazine", "magazines", "magic", "mail", "mailing", "main", "maine", "maintain", "maintained", "maintenance", "major", "majority", "make", "makes", "making", "male", "man", "manage", "managed", "management", "manager", "manner", "manual", "manufacturer", "manufacturers", "manufacturing", "many", "map", "maps", "mar", "march", "marine", "mark", "market", "marketing", "marketplace", "markets", "marriage", "married", "martin", "mary", "maryland", "mass", "massachusetts", "master", "match", "matching", "material", "materials", "math", "matrix", "matter", "matters", "mature", "max", "maximum", "may", "maybe", "mb", "md", "me", "mean", "meaning", "means", "measure", "measures", "media", "medical", "medicine", "medium", "meet", "meeting", "meetings", "member", "members", "membership", "memory", "men", "mental", "mentioned", "menu", "merchant", "message", "messages", "met", "metal", "method", "methods", "mexico", "mg", "mi", "miami", "michael", "michigan", "microsoft", "mid", "middle", "might", "mike", "miles", "military", "miller", "million", "min", "mind", "mine", "mini", "minimum", "minister", "ministry", "minnesota", "minor", "minute", "minutes", "miscellaneous", "miss", "missing", "mission", "missouri", "mix", "mixed", "mm", "mn", "mo", "mobile", "mode", "model", "models", "modern", "modified", "module", "mom", "moment", "mon", "monday", "money", "monitor", "monitoring", "month", "monthly", "months", "moon", "more", "morning", "mortgage", "most", "mostly", "mother", "motion", "motor", "motorola", "mount", "mountain", "mouse", "move", "moved", "movement", "movie", "movies", "moving", "mr", "ms", "msn", "mt", "much", "multi", "multimedia", "multiple", "museum", "music", "musical", "must", "my", "myself", "na", "naked", "name", "named", "names", "nation", "national", "nations", "native", "natural", "nature", "navigation", "nc", "nd", "ne", "near", "nearby", "nearly", "necessary", "need", "needed", "needs", "negative", "net", "netherlands", "network", "networking", "networks", "never", "new", "news", "newsletter", "newsletters", "newspaper", "next", "nice", "night", "nine", "nj", "nm", "no", "nokia", "non", "none", "nor", "normal", "north", "northern", "not", "note", "noted", "notes", "nothing", "notice", "nov", "november", "now", "nt", "nuclear", "null", "number", "numbers", "nursing", "nutrition", "ny", "object", "objectives", "objects", "obtain", "obtained", "ocean", "oct", "october", "of", "off", "offer", "offered", "offering", "offers", "office", "officer", "officers", "offices", "official", "officials", "often", "oh", "ohio", "oil", "ok", "oklahoma", "old", "older", "on", "once", "one", "ones", "online", "only", "ontario", "onto", "op", "open", "openai", "opening", "operating", "operation", "operations", "operator", "opinion", "opinions", "opportunities", "opportunity", "optical", "option", "optional", "options", "or", "oral", "orange", "order", "ordering", "orders", "oregon", "organization", "organizations", "origin", "original", "originally", "orlando", "os", "other", "others", "otherwise", "our", "out", "outdoor", "outdoors", "output", "outside", "over", "overall", "overview", "own", "owned", "owner", "owners", "oz", "pa", "pacific", "pack", "package", "packages", "page", "pages", "paid", "pain", "pair", "palm", "panasonic", "panel", "paper", "paperback", "papers", "parameters", "parent", "parents", "paris", "park", "parking", "parks", "part", "participants", "participation", "particular", "particularly", "parties", "partner", "partners", "partnership", "parts", "party", "pass", "passed", "password", "past", "patch", "path", "patient", "patients", "pattern", "patterns", "paul", "pay", "payment", "payments", "paypal", "pc", "pda", "pdf", "peace", "peak", "pennsylvania", "people", "peoples", "per", "percent", "perfect", "perform", "performance", "performed", "perhaps", "period", "permalink", "permanent", "permission", "permit", "person", "personal", "personnel", "persons", "pet", "peter", "pets", "pharmacy", "phase", "phentermine", "philadelphia", "philosophy", "phoenix", "phone", "phones", "photo", "photography", "photos", "php", "physical", "physics", "pic", "pick", "pics", "picture", "pictures", "piece", "pieces", "pink", "place", "placed", "places", "plan", "planet", "planning", "plans", "plant", "plants", "plastic", "platform", "play", "played", "player", "players", "playing", "please", "plus", "pm", "po", "pocket", "poetry", "point", "points", "poker", "police", "policies", "policy", "political", "politics", "pool", "poor", "pop", "popular", "population", "port", "portable", "portal", "portfolio", "position", "positions", "positive", "possible", "post", "postal", "posted", "poster", "posters", "posting", "posts", "potential", "power", "powered", "powerful", "pp", "pr", "practical", "practice", "practices", "pre", "premium", "prepared", "prescription", "presence", "present", "presentation", "presentations", "presented", "president", "press", "pressure", "pretty", "prev", "prevent", "prevention", "preview", "previous", "previously", "price", "prices", "pricing", "primary", "prime", "principal", "principles", "print", "printed", "printer", "printers", "printing", "prints", "prior", "priority", "privacy", "private", "pro", "probably", "problem", "problems", "procedure", "procedures", "process", "processes", "processing", "produce", "produced", "product", "production", "productivity", "products", "professional", "professionals", "professor", "profile", "profiles", "profit", "program", "programme", "programming", "programs", "progress", "project", "projects", "promote", "promotion", "proof", "proper", "properties", "property", "proposal", "proposed", "protect", "protected", "protection", "protein", "protocol", "provide", "provided", "provider", "providers", "provides", "providing", "provision", "provisions", "pst", "public", "publication", "publications", "published", "publisher", "publishing", "pubmed", "purchase", "purpose", "purposes", "put", "quality", "quantity", "quarter", "queen", "query", "question", "questions", "quick", "quickly", "quite", "quote", "quotes", "race", "racing", "radio", "rain", "random", "range", "rank", "rare", "rate", "rated", "rates", "rather", "rating", "ratings", "ratio", "ray", "rd", "re", "reach", "read", "reader", "readers", "reading", "ready", "real", "reality", "really", "reason", "reasonable", "reasons", "receive", "received", "recent", "recently", "recipe", "recipes", "recommend", "recommendations", "recommended", "record", "recorded", "recording", "records", "recovery", "recreation", "red", "reduce", "reduced", "reduction", "refer", "reference", "references", "referred", "regarding", "region", "regional", "regions", "register", "registered", "registration", "regular", "regulation", "regulations", "related", "relations", "relationship", "relationships", "relative", "release", "released", "releases", "relevant", "relief", "religion", "religious", "remain", "remains", "remember", "remote", "removal", "remove", "removed", "rent", "rental", "rentals", "repair", "replace", "replacement", "replies", "reply", "report", "reported", "reporting", "reports", "represent", "representative", "republic", "request", "requests", "require", "required", "requirements", "requires", "research", "reserve", "reserved", "residential", "residents", "resolution", "resort", "resource", "resources", "respect", "respected", "respective", "response", "responsibility", "responsible", "rest", "restaurant", "restaurants", "result", "results", "retail", "return", "returned", "returns", "revenue", "review", "reviewed", "reviews", "revised", "revision", "rich", "richard", "ride", "right", "rights", "ring", "rings", "ringtones", "rise", "risk", "river", "road", "robert", "rock", "role", "roll", "rom", "room", "rooms", "root", "rose", "round", "route", "row", "royal", "rs", "rss", "rule", "rules", "run", "running", "runs", "rural", "russia", "russian", "rw", "sa", "safe", "safety", "said", "saint", "sale", "sales", "salt", "same", "sample", "samples", "samsung", "san", "santa", "sat", "satellite", "saturday", "save", "savings", "saw", "say", "saying", "says", "sc", "scale", "scene", "schedule", "scheme", "school", "schools", "science", "sciences", "scientific", "score", "scotland", "scott", "screen", "script", "sd", "se", "sea", "search", "searches", "season", "seat", "seattle", "sec", "second", "secondary", "seconds", "secret", "secretary", "section", "sections", "sector", "secure", "security", "see", "seeing", "seeking", "seem", "seems", "seen", "select", "selected", "selection", "self", "sell", "seller", "sellers", "selling", "senate", "send", "senior", "sense", "sent", "sentence", "sentences", "sep", "separate", "september", "sequence", "serial", "series", "serious", "serve", "served", "server", "servers", "service", "services", "serving", "session", "set", "sets", "setting", "settings", "seven", "several", "sexual", "shall", "shape", "share", "shared", "shares", "sharing", "she", "sheet", "ship", "shipping", "ships", "shirt", "shirts", "shoes", "shop", "shopping", "shops", "short", "shot", "should", "show", "showing", "shown", "shows", "sick", "side", "sign", "signal", "signature", "signed", "significant", "signs", "silver", "similar", "simple", "simply", "since", "singapore", "single", "singles", "sir", "site", "sitemap", "sites", "situation", "six", "size", "ski", "skills", "skin", "skip", "sky", "sleep", "slightly", "slow", "small", "smart", "smith", "smoking", "snow", "so", "soccer", "social", "society", "soft", "software", "softwares", "sold", "solid", "solution", "solutions", "some", "someone", "something", "sometime", "sometimes", "son", "song", "songs", "sony", "soon", "sorry", "sort", "sorted", "soul", "sound", "sounds", "source", "sources", "south", "southern", "spa", "space", "spain", "spam", "spanish", "speak", "speaker", "speakers", "special", "specials", "species", "specific", "specifically", "specifications", "specified", "specs", "speech", "speed", "spell", "spelled", "spelling", "spells", "spend", "spent", "spirit", "sponsor", "sponsored", "sport", "sports", "spot", "spring", "springs", "sql", "square", "src", "ss", "st", "staff", "stage", "stand", "standard", "standards", "standing", "star", "stars", "start", "started", "starting", "state", "stated", "statement", "statements", "states", "static", "station", "stations", "statistics", "stats", "status", "stay", "steel", "step", "steps", "steve", "still", "stock", "stone", "stop", "storage", "store", "stores", "stories", "story", "straight", "strategic", "strategies", "strategy", "stream", "street", "strength", "stress", "string", "strong", "structure", "structures", "student", "students", "studies", "studio", "study", "stuff", "style", "sub", "subject", "subjects", "submit", "submitted", "subscribe", "subscription", "success", "successful", "such", "suggest", "suggested", "suggestions", "suite", "suites", "summary", "summer", "sun", "sunday", "super", "supplied", "suppliers", "supplies", "supply", "support", "supported", "supports", "sure", "surface", "surgery", "survey", "sweet", "switch", "sydney", "system", "systems", "table", "tables", "tag", "tags", "take", "taken", "takes", "taking", "talk", "talking", "tape", "target", "task", "tax", "taxes", "taylor", "tea", "teacher", "teachers", "teaching", "team", "teams", "tech", "technical", "techniques", "technologies", "technology", "teen", "teens", "tel", "telephone", "television", "tell", "temperature", "ten", "tennessee", "tennis", "term", "terms", "test", "testing", "tests", "texas", "text", "th", "than", "thank", "thanks", "that", "the", "theater", "theatre", "their", "them", "theme", "themselves", "then", "theory", "therapy", "there", "therefore", "these", "they", "thing", "things", "think", "thinking", "third", "this", "thomas", "those", "though", "thought", "thoughts", "thousands", "thread", "three", "through", "throughout", "thu", "thursday", "thus", "ticket", "tickets", "tim", "time", "times", "tip", "tips", "title", "titles", "tn", "to", "today", "together", "told", "toll", "tom", "tomorrow", "too", "took", "tool", "tools", "top", "topic", "topics", "toronto", "total", "touch", "tour", "tourism", "tours", "toward", "towards", "town", "toy", "toys", "track", "trackback", "tracking", "trade", "trademark", "trademarks", "trading", "traditional", "traffic", "train", "training", "transfer", "transit", "translation", "transport", "transportation", "travel", "treatment", "tree", "trees", "trends", "trial", "tried", "trip", "tripadvisor", "truck", "true", "trust", "truth", "try", "trying", "tue", "tuesday", "turkey", "turn", "turned", "tv", "two", "tx", "type", "types", "uk", "ultimate", "un", "under", "understand", "understanding", "union", "unique", "unit", "united", "units", "universal", "university", "unknown", "unless", "until", "unwell", "up", "update", "updated", "updates", "upgrade", "upon", "upper", "ups", "urban", "url", "us", "usa", "usage", "usb", "usd", "use", "used", "useful", "user", "username", "users", "uses", "using", "usr", "usually", "utah", "utilities", "utility", "va", "vacation", "valid", "valley", "value", "values", "van", "var", "variable", "variety", "various", "vegas", "vehicle", "vehicles", "vendor", "version", "very", "vhs", "via", "vice", "victoria", "video", "videos", "view", "viewed", "viewing", "views", "village", "vintage", "violence", "virginia", "virtual", "virus", "vision", "visit", "visitors", "visual", "voice", "void", "vol", "volume", "vote", "votes", "vs", "wa", "wait", "waiting", "wales", "walk", "wall", "want", "wanted", "wants", "war", "warning", "warranty", "wars", "was", "washington", "waste", "watch", "watches", "water", "way", "ways", "we", "wear", "weather", "web", "webmaster", "website", "websites", "wed", "wedding", "wednesday", "week", "weekend", "weekly", "weeks", "weight", "welcome", "well", "went", "were", "west", "western", "what", "whatever", "wheel", "when", "where", "whether", "which", "while", "white", "who", "whole", "wholesale", "whom", "whose", "why", "wi", "wide", "wife", "wild", "will", "william", "williams", "wilson", "win", "wind", "window", "windows", "wine", "winning", "winter", "wire", "wireless", "wisconsin", "wish", "with", "within", "without", "woman", "women", "won", "wonderful", "wood", "word", "words", "work", "worked", "workers", "working", "works", "workshop", "world", "worldwide", "worth", "would", "write", "writer", "writing", "written", "wrong", "wrote", "www", "xbox", "xml", "xp", "yahoo", "yeah", "year", "years", "yellow", "yes", "yesterday", "yet", "york", "you", "young", "your", "yourself", "youth", "zealand", "zero", "zip", "zone", "zoom", "zum"
+        ];
+
+        // 8. Client-Side Fallback Engine (Regex Rules & Levenshtein Spellcheck)
+        function runClientSideCorrections(text, mode) {
+            let workingText = text;
+            let edits = [];
+
+            let activeRules = [...(RULES.standard || [])];
+            if (mode !== 'standard' && RULES[mode]) {
+                activeRules = [...activeRules, ...RULES[mode]];
+            }
+
+            const maxEdits = 100;
+            activeRules.forEach(r => r.pattern.lastIndex = 0);
+
+            // A. Apply standard/mode regex rules
+            for (let i = 0; i < activeRules.length; i++) {
+                const rule = activeRules[i];
+                let match;
+                rule.pattern.lastIndex = 0;
+                let guard = 0;
+
+                while ((match = rule.pattern.exec(workingText)) !== null && edits.length < maxEdits && guard < 50) {
+                    guard++;
+                    const originalStr = match[0];
+                    let replacement = (typeof rule.replace === 'function') 
+                        ? rule.replace(...match) 
+                        : rule.replace;
+
+                    // Match capitalization
+                    if (originalStr[0] === originalStr[0].toUpperCase()) {
+                        replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+                    }
+
+                    const editId = edits.length;
+                    edits.push({
+                        id: editId,
+                        original: originalStr,
+                        corrected: replacement,
+                        explanation: rule.explanation,
+                        desc: rule.desc
+                    });
+
+                    const placeholder = `##EDIT_${editId}##`;
+                    workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + originalStr.length);
+                    rule.pattern.lastIndex = match.index + placeholder.length;
+                }
+            }
+
+            // B. Apply Levenshtein Spellcheck on remaining words
+            const tokens = workingText.split(/(\b[a-zA-Z']+\b)/);
+            for (let t = 1; t < tokens.length; t += 2) {
+                const word = tokens[t];
+                const lowerWord = word.toLowerCase();
+                
+                // Skip if word is already correct in dictionary
+                if (DICTIONARY.includes(lowerWord)) continue;
+                
+                // Skip single letters other than 'a', 'i'
+                if (word.length <= 1 && lowerWord !== 'a' && lowerWord !== 'i') continue;
+                
+                // Skip if it contains numbers or has contractions (dealt with in rules)
+                if (/\d/.test(word) || word.includes("'")) continue;
+                
+                let bestMatch = null;
+                let minDistance = 999;
+                
+                for (let d = 0; d < DICTIONARY.length; d++) {
+                    const dictWord = DICTIONARY[d];
+                    const dist = getLevenshteinDistance(lowerWord, dictWord);
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        bestMatch = dictWord;
+                    }
+                }
+                
+                // Allow edit distance of 1 for words < 5 chars, max 2 for longer words
+                let maxAllowed = (word.length >= 5) ? 2 : 1;
+                
+                if (minDistance > 0 && minDistance <= maxAllowed && bestMatch) {
+                    let replacement = bestMatch;
+                    // Match capitalization
+                    if (word[0] === word[0].toUpperCase()) {
+                        replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+                    }
+                    if (word === word.toUpperCase() && word.length > 1) {
+                        replacement = replacement.toUpperCase();
+                    }
+                    
+                    const editId = edits.length;
+                    edits.push({
+                        id: editId,
+                        original: word,
+                        corrected: replacement,
+                        explanation: "Spelling Typo",
+                        desc: `Corrected spelling typo '${word}' to '${replacement}'.`
+                    });
+                    
+                    tokens[t] = `##EDIT_${editId}##`;
+                }
+            }
+            workingText = tokens.join('');
+
+            // Fallback generic enhancements if no specific rules matched to showcase highlight states
+            if (edits.length === 0) {
+                const genericEnhancements = [
+                    { word: "refining", replace: "optimizing", exp: "Vocabulary Choice", desc: "Use 'optimizing' for a more active and professional tone." },
+                    { word: "professional", replace: "exemplary", exp: "Style Enhancement", desc: "Elevate 'professional' to 'exemplary' to sound more authoritative." },
+                    { word: "standards", replace: "benchmarks", exp: "Vocabulary Choice", desc: "Use 'benchmarks' to refer to competitive thresholds." },
+                    { word: "great", replace: "exceptional", exp: "Style Enhancement", desc: "Use 'exceptional' to convey outstanding quality." },
+                    { word: "happy", replace: "delighted", exp: "Vocabulary Choice", desc: "Use 'delighted' to convey greater enthusiasm." },
+                    { word: "sad", replace: "melancholic", exp: "Vocabulary Choice", desc: "Use 'melancholic' for a more evocative description." },
+                    { word: "fast", replace: "expeditious", exp: "Vocabulary Choice", desc: "Use 'expeditious' for high-precision formal writing." },
+                    { word: "make", replace: "construct", exp: "Vocabulary Choice", desc: "Use 'construct' or 'develop' for action-oriented phrasing." }
+                ];
+
+                for (let enhance of genericEnhancements) {
+                    const regex = new RegExp(`\\b${enhance.word}\\b`, 'i');
+                    const match = regex.exec(workingText);
+                    if (match && edits.length < maxEdits) {
+                        const originalStr = match[0];
+                        let replacement = enhance.replace;
+                        if (originalStr[0] === originalStr[0].toUpperCase()) {
+                            replacement = replacement.charAt(0).toUpperCase() + replacement.slice(1);
+                        }
+
+                        const editId = edits.length;
+                        edits.push({
+                            id: editId,
+                            original: originalStr,
+                            corrected: replacement,
+                            explanation: enhance.exp,
+                            desc: enhance.desc
+                        });
+
+                        const placeholder = `##EDIT_${editId}##`;
+                        workingText = workingText.substring(0, match.index) + placeholder + workingText.substring(match.index + originalStr.length);
+                    }
+                }
+            }
+
+            let htmlOutput = workingText;
+            
+            // Escape HTML
+            htmlOutput = htmlOutput
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;");
+
+            // Replace placeholders with spans
+            edits.forEach(edit => {
+                const spanTag = `<span class="ai-highlight" data-edit-id="${edit.id}">${edit.corrected}</span>`;
+                htmlOutput = htmlOutput.replace(`##EDIT_${edit.id}##`, spanTag);
+            });
+
+            // Fallback formats if completely empty
+            if (edits.length === 0) {
+                htmlOutput = htmlOutput.trim();
+                if (htmlOutput.length > 0) {
+                    if (htmlOutput[0] !== htmlOutput[0].toUpperCase()) {
+                        htmlOutput = htmlOutput[0].toUpperCase() + htmlOutput.slice(1);
+                    }
+                    if (!/[.!?]$/.test(htmlOutput)) {
+                        htmlOutput = htmlOutput + ".";
+                    }
+                }
+            }
+
+            return {
+                correctedText: text, // placeholder references
+                html: htmlOutput,
+                edits: edits
+            };
+        }
+
+        // 9. Interactive Correction Rendering & Tooltips
+        let activeEditId = null;
+        let activeSpan = null;
+        const tooltip = document.getElementById('correction-tooltip');
+        const tooltipCategory = document.getElementById('tooltip-category');
+        const tooltipOriginal = document.getElementById('tooltip-original');
+        const tooltipCorrected = document.getElementById('tooltip-corrected');
+        const tooltipDesc = document.getElementById('tooltip-desc');
+
+        outputView.addEventListener('click', (e) => {
+            const highlightSpan = e.target.closest('.ai-highlight');
+            if (!highlightSpan) {
+                if (!e.target.closest('#correction-tooltip')) {
+                    hideTooltip();
+                }
+                return;
+            }
+            e.stopPropagation();
+
+            const editId = parseInt(highlightSpan.getAttribute('data-edit-id'), 10);
+            const edit = state.edits.find(ed => ed.id === editId);
+            if (!edit) return;
+
+            activeEditId = editId;
+            activeSpan = highlightSpan;
+
+            showTooltip(highlightSpan, edit);
+        });
+
+        function showTooltip(span, edit) {
+            tooltipCategory.textContent = edit.explanation || 'Suggestion';
+            tooltipOriginal.textContent = edit.original;
+            tooltipCorrected.textContent = edit.corrected;
+            tooltipDesc.textContent = edit.desc || 'No explanation available.';
+
+            const isReverted = span.getAttribute('data-reverted') === 'true';
+            const revertBtn = document.getElementById('tooltip-revert-btn');
+
+            if (isReverted) {
+                revertBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[14px]">redo</span>
+                    Restore Correction
+                `;
+                revertBtn.classList.remove('hover:text-error');
+                revertBtn.classList.add('hover:text-primary');
+            } else {
+                revertBtn.innerHTML = `
+                    <span class="material-symbols-outlined text-[14px]">undo</span>
+                    Revert
+                `;
+                revertBtn.classList.add('hover:text-error');
+                revertBtn.classList.remove('hover:text-primary');
+            }
+
+            tooltip.classList.remove('hidden');
+
+            const spanRect = span.getBoundingClientRect();
+            const scrollTop = window.scrollY || document.documentElement.scrollTop;
+            const scrollLeft = window.scrollX || document.documentElement.scrollLeft;
+
+            let top = spanRect.bottom + scrollTop + 8;
+            let left = spanRect.left + scrollLeft + (spanRect.width / 2) - 160;
+
+            // Stay within viewport limits
+            if (left < 16) left = 16;
+            if (left + 320 > window.innerWidth - 16) {
+                left = window.innerWidth - 320 - 16;
+            }
+
+            tooltip.style.top = `${top}px`;
+            tooltip.style.left = `${left}px`;
+
+            setTimeout(() => {
+                tooltip.classList.remove('opacity-0', 'scale-95');
+                tooltip.classList.add('opacity-100', 'scale-100');
+            }, 10);
+        }
+
+        function hideTooltip() {
+            if (tooltip.classList.contains('hidden')) return;
+            tooltip.classList.remove('opacity-100', 'scale-100');
+            tooltip.classList.add('opacity-0', 'scale-95');
+            setTimeout(() => {
+                tooltip.classList.add('hidden');
+            }, 150);
+            activeEditId = null;
+            activeSpan = null;
+        }
+
+        document.getElementById('tooltip-close').addEventListener('click', hideTooltip);
+
+        document.getElementById('tooltip-revert-btn').addEventListener('click', () => {
+            if (!activeSpan || activeEditId === null) return;
+            const edit = state.edits.find(ed => ed.id === activeEditId);
+            if (!edit) return;
+
+            const isReverted = activeSpan.getAttribute('data-reverted') === 'true';
+
+            if (isReverted) {
+                activeSpan.textContent = edit.corrected;
+                activeSpan.setAttribute('data-reverted', 'false');
+                activeSpan.className = "ai-highlight";
+                showToast("Correction restored.");
+            } else {
+                activeSpan.textContent = edit.original;
+                activeSpan.setAttribute('data-reverted', 'true');
+                activeSpan.className = "text-slate-400 dark:text-slate-500 border-b border-dashed border-slate-300 dark:border-slate-700 cursor-pointer";
+                showToast("Reverted to original text.");
+            }
+            hideTooltip();
+        });
+
+        document.getElementById('tooltip-accept-btn').addEventListener('click', () => {
+            if (!activeSpan || activeEditId === null) return;
+
+            const textNode = document.createTextNode(activeSpan.textContent);
+            activeSpan.parentNode.replaceChild(textNode, activeSpan);
+            
+            showToast("Correction accepted.");
+            hideTooltip();
+        });
+
+        // Hide tooltip on escape key or resize
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                hideTooltip();
+                hideSettings();
+                hideHistory();
+            }
+        });
+
+        window.addEventListener('resize', hideTooltip);
+
+        // 10. Execution Handler (Fix Text Button)
+        enhanceBtn.addEventListener('click', async () => {
+            const rawText = inputArea.value.trim();
+            if (!rawText) return;
+
+            state.isLoading = true;
+            hideTooltip();
+            hideErrorBanner();
+
+            // Disable button & change status to Correcting
+            enhanceBtn.disabled = true;
+            enhanceBtn.innerHTML = `
+                <span class="animate-spin material-symbols-outlined" data-icon="autorenew">autorenew</span>
+                Correcting...
+            `;
+            enhanceBtn.classList.add('opacity-80', 'cursor-not-allowed');
+
+            // Render animated pulsing skeleton loaders in the output panel
+            outputView.innerHTML = `
+                <div class="animate-pulse space-y-4 py-2 w-full">
+                    <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-11/12"></div>
+                    <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-5/6"></div>
+                    <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-full"></div>
+                    <div class="h-4 bg-slate-200 dark:bg-slate-800 rounded w-3/4"></div>
+                </div>
+            `;
+
+            const spellcheck = document.getElementById('spellcheck-status');
+            if (spellcheck) spellcheck.textContent = "Processing...";
+
+            // Delay correction slightly for smooth loading animation transition
+            setTimeout(async () => {
+                try {
+                    let result;
+                    if (state.apiConfig.provider === 'backend') {
+                        // Call Secure Backend API proxy
+                        try {
+                            const apiOrigin = (window.location.protocol === 'file:' || window.location.origin === 'null') 
+                                ? 'http://localhost:3000' 
+                                : '';
+                            const response = await fetch(`${apiOrigin}/api/enhance`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    text: rawText,
+                                    mode: state.mode
+                                })
+                            });
+
+                            if (!response.ok) {
+                                const errData = await response.json().catch(() => ({}));
+                                throw new Error(errData.error || `Server returned status ${response.status}`);
+                            }
+
+                            const apiResult = await response.json();
+                            
+                            let html = apiResult.correctedText;
+                            let edits = apiResult.edits || [];
+                            
+                            html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                            
+                            edits.forEach((edit, index) => {
+                                edit.id = index;
+                                const escapedCorrected = edit.corrected.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                const spanTag = `<span class="ai-highlight" data-edit-id="${index}">${escapedCorrected}</span>`;
+                                html = html.replace(escapedCorrected, spanTag);
+                            });
+                            
+                            result = {
+                                correctedText: apiResult.correctedText,
+                                html: html,
+                                edits: edits
+                            };
+                            showToast("Text enhanced via Backend API!");
+                        } catch (backendError) {
+                            console.error("Backend Proxy Failed:", backendError);
+                            showErrorBanner(`Backend correction failed: ${backendError.message}. Using client fallback.`);
+                            result = runClientSideCorrections(rawText, state.mode);
+                        }
+                    } else if (state.apiConfig.provider !== 'demo' && state.apiConfig.apiKey) {
+                        // Call Client-side direct AI API
+                        try {
+                            const apiResult = await fetchAIResponse(rawText, state.mode, state.apiConfig);
+                            
+                            let html = apiResult.correctedText;
+                            let edits = apiResult.edits || [];
+                            
+                            html = html.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                            
+                            edits.forEach((edit, index) => {
+                                edit.id = index;
+                                const escapedCorrected = edit.corrected.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                                const spanTag = `<span class="ai-highlight" data-edit-id="${index}">${escapedCorrected}</span>`;
+                                html = html.replace(escapedCorrected, spanTag);
+                            });
+                            
+                            result = {
+                                correctedText: apiResult.correctedText,
+                                html: html,
+                                edits: edits
+                            };
+                            showToast("Text enhanced via Client AI!");
+                        } catch (apiError) {
+                            console.error("AI API Call Failed:", apiError);
+                            showErrorBanner("Client AI correction failed. Using client fallback.");
+                            result = runClientSideCorrections(rawText, state.mode);
+                        }
+                    } else {
+                        // Demo fallback rules
+                        result = runClientSideCorrections(rawText, state.mode);
+                        showToast("Text enhanced locally (Demo Mode).");
+                    }
+
+                    // Save output state
+                    state.outputText = result.html;
+                    state.edits = result.edits;
+
+                    // Render corrections
+                    outputView.innerHTML = `<div class="animate-in fade-in slide-in-from-bottom-2 duration-500">${result.html}</div>`;
+                    
+                    // Save to history list
+                    saveHistory(rawText, result.html);
+                    
+                    if (spellcheck) spellcheck.textContent = "Optimized";
+                } catch (generalError) {
+                    console.error("General enhancement error:", generalError);
+                    showErrorBanner("An unexpected error occurred. Please try again.");
+                    outputView.innerHTML = `<p class="text-red-500 italic">An error occurred during correction. Please check your settings.</p>`;
+                    if (spellcheck) spellcheck.textContent = "Error";
+                } finally {
+                    state.isLoading = false;
+                    enhanceBtn.disabled = false;
+                    enhanceBtn.innerHTML = `
+                        <span class="material-symbols-outlined" data-icon="magic_button" style="font-variation-settings: 'FILL' 1;">magic_button</span>
+                        Fix Text
+                    `;
+                    enhanceBtn.classList.remove('opacity-80', 'cursor-not-allowed');
+                }
+            }, 800);
+        });
+
+        // 11. Correction History Slide-over panel
+        let history = [];
+        const historyPanel = document.getElementById('history-panel');
+        const historyBackdrop = document.getElementById('history-backdrop');
+
+        function loadHistory() {
+            try {
+                history = JSON.parse(localStorage.getItem('alpha_correct_history') || '[]');
+            } catch (e) {
+                history = [];
+            }
+            updateHistoryUI();
+        }
+
+        function saveHistory(input, output) {
+            if (history.length > 0 && history[0].input === input && history[0].output === output) return;
+
+            history.unshift({
+                id: Date.now(),
+                input,
+                output,
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            });
+
+            if (history.length > 20) history.pop();
+            localStorage.setItem('alpha_correct_history', JSON.stringify(history));
+            updateHistoryUI();
+        }
+
+        function updateHistoryUI() {
+            const list = document.getElementById('history-list');
+            const count = document.getElementById('history-count');
+            
+            if (count) count.textContent = `${history.length} entries`;
+            if (!list) return;
+
+            if (history.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-xl text-on-surface-variant dark:text-slate-500 italic">
+                        <span class="material-symbols-outlined text-[48px] opacity-40 mb-sm">history_toggle_off</span>
+                        <p class="text-body-sm">No history entries yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = history.map(item => `
+                <div class="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-750 transition-all duration-150 relative" data-id="${item.id}">
+                    <div class="flex justify-between items-center mb-xs">
+                        <span class="text-label-sm font-label-sm text-[#00A86B] font-bold">${item.date}</span>
+                        <button class="text-on-surface-variant dark:text-slate-400 hover:text-error remove-history-item flex items-center justify-center p-0.5 rounded">
+                            <span class="material-symbols-outlined text-[16px]">delete</span>
+                        </button>
+                    </div>
+                    <p class="text-body-sm truncate font-medium dark:text-slate-200 mb-0.5">${item.input || ''}</p>
+                    <p class="text-body-sm truncate text-on-surface-variant dark:text-slate-400 italic">${(item.output || '').replace(/<[^>]*>/g, '')}</p>
+                </div>
+            `).join('');
+
+            // Bind click handlers
+            list.querySelectorAll('[data-id]').forEach(elem => {
+                const removeBtn = elem.querySelector('.remove-history-item');
+                
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const id = parseInt(elem.getAttribute('data-id'), 10);
+                        deleteHistoryItem(id);
+                    });
+                }
+
+                elem.addEventListener('click', () => {
+                    const id = parseInt(elem.getAttribute('data-id'), 10);
+                    const item = history.find(h => h.id === id);
+                    if (item) {
+                        inputArea.value = item.input;
+                        inputArea.dispatchEvent(new Event('input'));
+                        state.inputText = item.input;
+                        state.outputText = item.output;
+                        outputView.innerHTML = item.output;
+                        hideHistory();
+                        showToast("Loaded from history.");
+                    }
+                });
+            });
+        }
+
+        function deleteHistoryItem(id) {
+            history = history.filter(h => h.id !== id);
+            localStorage.setItem('alpha_correct_history', JSON.stringify(history));
+            updateHistoryUI();
+            showToast("Item deleted from history.");
+        }
+
+        const showHistory = () => {
+            loadHistory();
+            historyBackdrop.classList.remove('hidden');
+            setTimeout(() => {
+                historyBackdrop.classList.remove('opacity-0');
+                historyPanel.classList.remove('translate-x-full');
+            }, 10);
+            hideTooltip();
+        };
+
+        const hideHistory = () => {
+            historyPanel.classList.add('translate-x-full');
+            historyBackdrop.classList.add('opacity-0');
+            setTimeout(() => {
+                historyBackdrop.classList.add('hidden');
+            }, 300);
+        };
+
+        document.getElementById('nav-dashboard').addEventListener('click', (e) => {
+            e.preventDefault();
+            hideHistory();
+            hideSettings();
+            hideTooltip();
+        });
+
+        document.getElementById('nav-history').addEventListener('click', (e) => {
+            e.preventDefault();
+            showHistory();
+        });
+
+        const mobileHistoryBtn = document.getElementById('mobile-history-btn');
+        if (mobileHistoryBtn) {
+            mobileHistoryBtn.addEventListener('click', showHistory);
+        }
+
+        document.getElementById('close-history-btn').addEventListener('click', hideHistory);
+        historyBackdrop.addEventListener('click', hideHistory);
+
+        document.getElementById('clear-history-btn').addEventListener('click', () => {
+            if (confirm("Are you sure you want to clear your correction history?")) {
+                history = [];
+                localStorage.setItem('alpha_correct_history', JSON.stringify(history));
+                updateHistoryUI();
+                showToast("History cleared.");
+            }
+        });
+
+        // Close dropdown or modal click-out
+        document.addEventListener('click', (e) => {
+            // Hide tooltip if clicked outside output view
+            if (!e.target.closest('#output-view') && !e.target.closest('#correction-tooltip')) {
+                hideTooltip();
+            }
+        });
+    </script>
+</body>
+</html>
