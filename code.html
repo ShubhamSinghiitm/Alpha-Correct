@@ -349,6 +349,14 @@
                         </button>
                     </div>
                 </div>
+
+                <div id="cors-warning" class="hidden text-[12px] text-amber-600 bg-amber-50 dark:bg-amber-950/20 dark:text-amber-400 border border-amber-250 dark:border-amber-900 rounded-lg p-sm leading-relaxed">
+                    <span class="font-bold flex items-center gap-xs mb-1">
+                        <span class="material-symbols-outlined text-[16px] text-amber-500">warning</span>
+                        Browser CORS Restriction
+                    </span>
+                    Direct browser calls to OpenAI are blocked by CORS policies. Use **Backend Server** mode and set your key in the server's `.env` for production use.
+                </div>
                 
                 <div id="api-endpoint-container" class="hidden space-y-xs">
                     <label class="block text-label-sm font-label-sm text-on-surface-variant dark:text-slate-400 mb-xs font-bold">ENDPOINT URL</label>
@@ -832,19 +840,23 @@
             const keyContainer = document.getElementById('api-key-container');
             const endpointContainer = document.getElementById('api-endpoint-container');
             const modelContainer = document.getElementById('api-model-container');
+            const corsWarning = document.getElementById('cors-warning');
 
             if (provider === 'demo' || provider === 'backend') {
                 keyContainer.classList.add('hidden');
                 endpointContainer.classList.add('hidden');
                 modelContainer.classList.add('hidden');
+                if (corsWarning) corsWarning.classList.add('hidden');
             } else if (provider === 'openai') {
                 keyContainer.classList.remove('hidden');
                 endpointContainer.classList.add('hidden');
                 modelContainer.classList.remove('hidden');
+                if (corsWarning) corsWarning.classList.remove('hidden');
             } else if (provider === 'custom') {
                 keyContainer.classList.remove('hidden');
                 endpointContainer.classList.remove('hidden');
                 modelContainer.classList.remove('hidden');
+                if (corsWarning) corsWarning.classList.add('hidden');
             }
         }
 
